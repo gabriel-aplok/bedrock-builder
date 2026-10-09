@@ -40,3 +40,7 @@ npm run vsix
 ```
 
 Install the vsix with `Extensions: Install from VSIX`, or run with F5 from `bedrock-vscode/`.
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md).
