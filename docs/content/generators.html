@@ -5,12 +5,19 @@
 </p>
 <pre><code>bb new weapon fire_sword --mode 3d --icon sword
 bb new block glow_block --light 12
-bb new recipe steel_ingot --recipe-kind furnace --result steel_ingot</code></pre>
+bb new recipe steel_ingot --recipe-kind furnace --result steel_ingot
+bb new item ruby --from ./sword.json</code></pre>
+<p>
+  <code>--from</code> imports the behavior body from an existing json file instead of generating
+  one. Registries, lang entries, and sidecars are still wired from the flags. Identifiers in the
+  imported file move into the project namespace. The file must share a top-level key with the
+  generated behavior file, like <code>minecraft:item</code>.
+</p>
 <h2>Types</h2>
 <p>
   weapon, tool, armor, item, entity, block, recipe, loot, spawn, trade, dialogue, animation,
   equipment, feature, feature_rule, particle, fog, function, voxel_shape, biome, camera,
-  item_catalog, sound, biomes_client, block_culling, dimension, ui.
+  item_catalog, sound, biomes_client, block_culling, dimension, ui, loot_table.
 </p>
 <h2>Common flags</h2>
 <table>
@@ -44,6 +51,14 @@ bb new recipe steel_ingot --recipe-kind furnace --result steel_ingot</code></pre
     <tr>
       <td><code>--texture &lt;path&gt;</code></td>
       <td>3D texture path or block texture key.</td>
+    </tr>
+    <tr>
+      <td><code>--from &lt;file&gt;</code></td>
+      <td>Import the behavior body from a json file.</td>
+    </tr>
+    <tr>
+      <td><code>--spawn-egg</code></td>
+      <td>Write a spawn egg item for the entity.</td>
     </tr>
     <tr>
       <td><code>--force</code></td>
@@ -170,6 +185,22 @@ bb new recipe steel_ingot --recipe-kind furnace --result steel_ingot</code></pre
     <tr>
       <td><code>--max &lt;n&gt;</code></td>
       <td>Loot drop max count.</td>
+    </tr>
+    <tr>
+      <td><code>--unlock &lt;id&gt;</code></td>
+      <td>Recipe unlock item id or context:name. Defaults to the first ingredient.</td>
+    </tr>
+    <tr>
+      <td><code>--pools &lt;n&gt;</code></td>
+      <td>Loot table pool count, 1 to 16. Default is 3.</td>
+    </tr>
+    <tr>
+      <td><code>--max-uses &lt;n&gt;</code></td>
+      <td>Trade max uses.</td>
+    </tr>
+    <tr>
+      <td><code>--xp &lt;n&gt;</code></td>
+      <td>Trade xp reward.</td>
     </tr>
   </tbody>
 </table>

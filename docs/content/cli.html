@@ -51,7 +51,7 @@
     </tr>
     <tr>
       <td><code>check</code></td>
-      <td>Verify config, packs, entry, deploy target.</td>
+      <td>Verify config, packs, entry, scripts, deploy target.</td>
     </tr>
     <tr>
       <td><code>new &lt;type&gt; [name]</code></td>
@@ -66,12 +66,24 @@
       <td>Set the version in config plus manifests.</td>
     </tr>
     <tr>
+      <td><code>update</code></td>
+      <td>Update deps plus the server manifest version.</td>
+    </tr>
+    <tr>
       <td><code>harness</code></td>
       <td>Build then cross-check every dist reference.</td>
     </tr>
     <tr>
       <td><code>publish</code></td>
       <td>Ship, harness, optional bump, tag, push.</td>
+    </tr>
+    <tr>
+      <td><code>completion [shell]</code></td>
+      <td>Print shell completions for bash, zsh, or powershell.</td>
+    </tr>
+    <tr>
+      <td><code>import [dir]</code></td>
+      <td>Adopt a pack folder into a bb project.</td>
     </tr>
   </tbody>
 </table>
@@ -170,24 +182,48 @@
   Detects the layout, rewrites both manifests with consistent names and versions, and cross-links
   the RP dependency to the BP uuid.
 </p>
+<h2>import</h2>
+<pre><code>bb import [dir] [--force] [--dry-run] [--json]</code></pre>
+<p>
+  Adopts an existing pack folder, hand-made or from bridge., into a bb project. Reads names and
+  versions from the manifests and any Bedrock-OSS config already there, then writes the missing
+  <code>config.json</code> and <code>package.json</code>. Manifests are never rewritten. With an
+  existing <code>config.json</code>, only <code>--force</code> merges the bb settings into it.
+</p>
+<h2>completion</h2>
+<pre><code>bb completion [bash|zsh|powershell]</code></pre>
+<p>Prints a completion script for the given shell, bash by default. Source it from your profile:</p>
+<pre><code>bb completion bash >> ~/.bashrc
+bb completion zsh > ~/.zfunc/_bb
+bb completion powershell >> $PROFILE</code></pre>
 <h2>version</h2>
 <pre><code>bb version &lt;semver&gt; [--dry-run] [--json]</code></pre>
 <p>
   Writes one version to the config plus both manifests.
   <code>--dry-run</code> previews without writing.
 </p>
+<h2>update</h2>
+<pre><code>bb update [--dry-run] [--json]</code></pre>
+<p>
+  Updates <code>@minecraft/server</code> and <code>@aplok/bedrock-builder</code> to their latest
+  ranges, runs <code>npm install</code>, and syncs the BP manifest server version with the installed
+  one. Only declared dependencies are touched. <code>--dry-run</code> previews without writing.
+</p>
 <h2>harness</h2>
 <pre><code>bb harness [--no-build] [--strict] [--json]</code></pre>
 <p>
   Builds, then cross-checks every icon, texture, recipe, and spawn reference in
   <code>dist/</code>. <code>--no-build</code> checks the current <code>dist/</code> without
-  rebuilding. <code>--strict</code> also fails on missing pack icons and unused lang keys.
+  rebuilding. <code>--strict</code> also fails on missing pack icons, unused lang keys, and bad
+  textures.
 </p>
 <h2>init</h2>
-<pre><code>bb init &lt;name&gt; [--dir &lt;path&gt;] [--here] [--target-version &lt;v&gt;] [--js] [--git] [--install] [--force] [--json]</code></pre>
+<pre><code>bb init &lt;name&gt; [namespace] [--dir &lt;path&gt;] [--here] [--target-version &lt;v&gt;] [--js] [--git] [--install] [--builder &lt;path&gt;] [--force] [--json]</code></pre>
 <p>
   Creates a fresh project with config, manifests, entry file, and registries.
   <code>--here</code> creates into the current directory. <code>--js</code> emits
   <code>src/main.js</code> instead of TypeScript. <code>--force</code> overwrites a non-empty
-  directory.
+  directory. The optional namespace sets the identifier prefix, defaulting to the project name.
+  <code>--builder</code> uses a local builder tarball or directory for the generated
+  <code>devDependency</code> instead of the npm release.
 </p>

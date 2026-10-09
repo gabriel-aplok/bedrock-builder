@@ -147,6 +147,38 @@ function launcherHomes(): { path: string; label: string }[] {
   ];
 }
 
+const PREVIEW_DIRS: InstallDir[] = [
+  {
+    env: "APPDATA",
+    sub: "Minecraft Bedrock Preview/Users/Shared/games/com.mojang",
+    label: "Bedrock Preview launcher",
+  },
+  {
+    env: "LOCALAPPDATA",
+    sub: "Packages/Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe/LocalState/games/com.mojang",
+    label: "Store beta",
+  },
+];
+
+async function findPreviewHome(): Promise<string> {
+  if (currentPlatform() !== "win32") {
+    throw new DeployTargetError(
+      "Preview deploy is only supported on Windows. Use deploy.target custom with a Preview com.mojang path.",
+    );
+  }
+  const tried: string[] = [];
+  for (const spot of PREVIEW_DIRS) {
+    const base = process.env[spot.env];
+    if (!base) continue;
+    const full = join(base, spot.sub);
+    tried.push(`  - ${spot.label}: ${full}`);
+    if (await isDir(full)) return full;
+  }
+  throw new DeployTargetError(
+    `No Preview com.mojang found. Checked:\n${tried.join("\n")}\nInstall the Preview build or point deploy.customPath at its data dir.`,
+  );
+}
+
 async function findRetailHome(): Promise<string> {
   const tried: string[] = [];
   if (currentPlatform() === "win32") {
@@ -178,6 +210,8 @@ export async function resolveDeployTarget(config: BedrockConfig): Promise<Deploy
     if (custom === "") throw new DeployTargetError('Target "custom" needs deploy.customPath set.');
     root = resolve(config.deploy.customPath!);
     if (!(await isDir(root))) throw new DeployTargetError(`Custom deploy dir missing: ${root}`);
+  } else if (config.deploy.target === "preview") {
+    root = await findPreviewHome();
   } else {
     root = await findRetailHome();
   }

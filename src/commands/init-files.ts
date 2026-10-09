@@ -1,13 +1,12 @@
 import { randomUUID } from "node:crypto";
 
-import { deriveNamespace } from "../generate/core/identifier.js";
-
 // 64x64 solid icon, valid png, kept inline so init needs no asset files.
 const PACK_ICON =
   "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAmElEQVR4nO3QMREAIBDAsPeDU/ThB2RkoEP2Xmftc382OkBrgA7QGqADtAboAK0BOkBrgA7QGqADtAboAK0BOkBrgA7QGqADtAboAK0BOkBrgA7QGqADtAboAK0BOkBrgA7QGqADtAboAK0BOkBrgA7QGqADtAboAK0BOkBrgA7QGqADtAboAK0BOkBrgA7QGqADtAboAO0BT1qCWf17B98AAAAASUVORK5CYII=";
 
 export interface InitInput {
   name: string;
+  namespace: string;
   targetVersion: string;
   minEngineVersion: string;
   version: string;
@@ -33,7 +32,16 @@ function dump(obj: unknown): string {
 }
 
 export function buildInitFiles(input: InitInput): InitFile[] {
-  const { name, targetVersion, minEngineVersion, version, serverRange, builderRange, js } = input;
+  const {
+    name,
+    namespace,
+    targetVersion,
+    minEngineVersion,
+    version,
+    serverRange,
+    builderRange,
+    js,
+  } = input;
   const bpHeader = randomUUID();
   const bpData = randomUUID();
   const bpScript = randomUUID();
@@ -84,7 +92,7 @@ export function buildInitFiles(input: InitInput): InitFile[] {
     name,
     authors: [],
     targetVersion,
-    namespace: deriveNamespace(name),
+    namespace,
     packs: { behaviorPack: "packs/BP", resourcePack: "packs/RP" },
     worlds: [],
     bb: {

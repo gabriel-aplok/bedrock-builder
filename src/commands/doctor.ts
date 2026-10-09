@@ -6,6 +6,7 @@ import pc from "../colors.js";
 import type { BedrockConfig } from "../config.js";
 import { logger, printJson } from "../logger.js";
 import { resolveDeployTarget } from "../paths.js";
+import { checkScriptImports } from "../script-check.js";
 import { inspectExtensions } from "../pipeline/loader.js";
 import * as p from "../prompts.js";
 
@@ -130,6 +131,13 @@ export async function doctor(
       `Create the file or fix bb.entry in config.json.`,
     ),
   ];
+
+  const scripts = await checkScriptImports(
+    config.entry,
+    config.__configDir,
+    join(config.packs.bp, "manifest.json"),
+  );
+  checks.push(check("scripts", scripts.ok, scripts.detail, scripts.fix));
 
   const extensionRows = await inspectExtensions(config);
   for (const row of extensionRows) {

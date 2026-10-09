@@ -3,7 +3,7 @@ import { GenerateError } from "./core/errors.js";
 import { openPlan } from "./core/setup.js";
 import type { Tree } from "./core/tree.js";
 import type { CreateOptions, GeneratorResult } from "./core/types.js";
-import { renderRecipeJson } from "./templates/recipe.js";
+import { renderRecipeJson, type RecipeUnlock } from "./templates/recipe.js";
 
 const FURNACE_TAGS = new Set(["furnace", "blast_furnace", "smoker", "campfire", "soul_campfire"]);
 
@@ -75,6 +75,22 @@ function parseRecipeKey(raw: string | undefined, pattern: string[]): Record<stri
   return key;
 }
 
+function parseUnlock(raw: string | undefined, fallback: string): RecipeUnlock {
+  const text = raw?.trim() ? raw.trim() : fallback;
+  if (text.startsWith("context:")) {
+    const context = text.slice("context:".length).trim();
+    if (context === "")
+      throw new GenerateError('unlock context looks like "context:always_unlocked".');
+    return { context };
+  }
+  if (text === "" || !text.includes(":")) {
+    throw new GenerateError(
+      'unlock must be an item id like "minecraft:stick" or "context:always_unlocked".',
+    );
+  }
+  return { item: text };
+}
+
 export function planRecipe(
   tree: Tree,
   config: BedrockConfig,
@@ -90,6 +106,8 @@ export function planRecipe(
   if (kind === "shaped") {
     const pattern = parsePattern(opts.pattern);
     const key = parseRecipeKey(opts.recipeKey, pattern);
+    const keyItems = Object.values(key);
+    const unlock = parseUnlock(opts.unlock, keyItems[0] ?? "minecraft:stick");
     tree.write(
       `${bpRel}/recipes/${raw}.json`,
       renderRecipeJson({
@@ -102,6 +120,7 @@ export function planRecipe(
         input: "",
         pattern,
         key,
+        unlock,
       }),
     );
     return { notes: [`Shaped recipe, pattern ${pattern.join(" / ")}.`] };
@@ -122,6 +141,7 @@ export function planRecipe(
     }
   }
 
+  const unlock = parseUnlock(opts.unlock, ingredients[0] ?? input);
   tree.write(
     `${bpRel}/recipes/${raw}.json`,
     renderRecipeJson({
@@ -134,8 +154,9 @@ export function planRecipe(
       input,
       pattern: [],
       key: {},
+      unlock,
     }),
   );
 
-  return { notes: [`Recipe unlocks when the player picks up ${ingredients[0] ?? input}.`] };
+  return { notes: [`Recipe unlocks with ${unlock.item ?? unlock.context}.`] };
 }

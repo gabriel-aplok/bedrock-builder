@@ -1,3 +1,7 @@
+import { isRecord } from "../records.js";
+import { readFile } from "node:fs/promises";
+import { isAbsolute, resolve } from "node:path";
+
 import pc from "../colors.js";
 import * as p from "../prompts.js";
 
@@ -14,10 +18,10 @@ import { validateNamespace } from "../generate/core/identifier.js";
 import { hasConflict, planTree } from "../generate/core/plan.js";
 import { Tree } from "../generate/core/tree.js";
 import {
-    CREATE_TYPES,
-    type CreateOptions,
-    type CreateType,
-    type PlannedFile,
+  CREATE_TYPES,
+  type CreateOptions,
+  type CreateType,
+  type PlannedFile,
 } from "../generate/core/types.js";
 import { planDialogue } from "../generate/dialogue.js";
 import { planDimension } from "../generate/dimension.js";
@@ -30,6 +34,7 @@ import { planFunction } from "../generate/function.js";
 import { planItem } from "../generate/item.js";
 import { planItemCatalog } from "../generate/item_catalog.js";
 import { planLoot } from "../generate/loot.js";
+import { planLootTable } from "../generate/loot_table.js";
 import { planParticle } from "../generate/particle.js";
 import { planRecipe } from "../generate/recipe.js";
 import { planSound } from "../generate/sound.js";
@@ -53,6 +58,7 @@ const PLANNERS: Record<CreateType, Planner> = {
   block: planBlock,
   recipe: planRecipe,
   loot: planLoot,
+  loot_table: planLootTable,
   spawn: planSpawn,
   trade: planTrade,
   dialogue: planDialogue,
@@ -103,6 +109,9 @@ export async function create(config: BedrockConfig, opts: CreateOptions): Promis
 
   const tree = new Tree(config.__configDir);
   const outcome = PLANNERS[type](tree, config, resolved);
+  if (resolved.from !== undefined && resolved.from.trim() !== "") {
+    await applyFrom(tree, config, resolved.from.trim());
+  }
   const plan = planTree(tree, Boolean(resolved.force));
 
   if (resolved.dryRun) {
@@ -129,6 +138,58 @@ export async function create(config: BedrockConfig, opts: CreateOptions): Promis
     for (const note of outcome.notes) logger.info(note);
     logger.success(`done: ${type} ${resolved.name}`);
   }
+}
+
+// use an existing json file as the behavior definition. the
+// planner still runs, so registries, lang entries, and sidecars
+// are wired from the flags. the imported body replaces the one
+// planned behavior file sharing a top-level key with it, with
+// description identifiers moved into the project namespace.
+async function applyFrom(tree: Tree, config: BedrockConfig, source: string): Promise<void> {
+  const abs = isAbsolute(source) ? source : resolve(process.cwd(), source);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(await readFile(abs, "utf8"));
+  } catch (err) {
+    throw new GenerateError(
+      `Cannot read --from file ${abs}: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+  if (!isRecord(parsed) || Object.keys(parsed).length === 0) {
+    throw new GenerateError(`--from file must hold a non-empty json object: ${abs}`);
+  }
+  const body = structuredClone(parsed);
+  for (const section of Object.values(body)) {
+    if (!isRecord(section)) continue;
+    const desc = section.description;
+    if (!isRecord(desc) || typeof desc.identifier !== "string") continue;
+    const cut = desc.identifier.indexOf(":");
+    if (cut > 0) desc.identifier = `${config.namespace}${desc.identifier.slice(cut)}`;
+  }
+  const keys = Object.keys(body);
+  const matches: string[] = [];
+  for (const rel of tree.paths()) {
+    if (!rel.startsWith("packs/BP/") || !rel.endsWith(".json")) continue;
+    if (tree.mergePaths.has(rel)) continue;
+    const staged = tree.writes.get(rel);
+    if (staged === undefined) continue;
+    let stagedDoc: unknown;
+    try {
+      stagedDoc = JSON.parse(staged);
+    } catch {
+      continue;
+    }
+    if (isRecord(stagedDoc) && keys.some((key) => key in stagedDoc)) matches.push(rel);
+  }
+  if (matches.length === 0) {
+    throw new GenerateError(
+      `--from content (${keys.join(", ")}) matches no behavior file for this feature`,
+    );
+  }
+  if (matches.length > 1) {
+    throw new GenerateError(`--from content matches several files: ${matches.join(", ")}`);
+  }
+  tree.writes.set(matches[0]!, `${JSON.stringify(body, null, 2)}\n`);
 }
 
 function runsOnCI(): boolean {

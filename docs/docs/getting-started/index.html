@@ -95,8 +95,17 @@
 <span class="prompt" data-copy-skip>$ </span>npm install</code></pre></div>
 <p>
   <code>bb init</code> writes the config, both manifests with fresh UUIDs, a working entry file, and
-  the texture registries. Answer the prompts, or pass <code>--here</code>, <code>--js</code>,
-  <code>--git</code>, and <code>--install</code> to skip them.
+  the texture registries. Answer the prompts, or pass a name plus flags to skip them.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb init my-addon
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">init</span> my-addon my_addon
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">init</span> my-addon <span class="k">--builder</span> ../bedrock-builder/aplok-bedrock-builder-0.2.0.tgz</code></pre></div>
+<p>
+  The optional second positional sets the identifier namespace; it defaults to the project name with
+  dashes converted to underscores. <code>--builder</code> points the generated
+  <code>package.json</code> at a local builder tarball or directory instead of the npm release,
+  useful before publishing. Other flags: <code>--here</code>, <code>--js</code>, <code>--git</code>,
+  <code>--install</code>, <code>--force</code>.
 </p>
 <h2>Look at what you got</h2>
 <div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>my-addon/

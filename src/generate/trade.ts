@@ -13,6 +13,14 @@ function parseTradeId(raw: string, field: string): string {
   return id;
 }
 
+function parseTradeOpt(raw: number | undefined, field: string): number | undefined {
+  if (raw === undefined) return undefined;
+  if (!Number.isInteger(raw) || raw < 0) {
+    throw new GenerateError(`${field} must be an integer >= 0, got ${raw}.`);
+  }
+  return raw;
+}
+
 function parseTradeInt(raw: number | undefined, fallback: number, field: string): number {
   const value = raw ?? fallback;
   if (!Number.isInteger(value) || value < 1) {
@@ -30,6 +38,16 @@ export function planTrade(tree: Tree, config: BedrockConfig, opts: CreateOptions
   const wantMax = parseTradeInt(opts.max, 1, "max");
   if (wantMin > wantMax) throw new GenerateError(`min ${wantMin} is above max ${wantMax}.`);
 
-  tree.write(`${bpRel}/trading/${raw}.json`, renderTradeJson({ want, wantMin, wantMax, give }));
-  return { notes: [`Trade ${wantMin}-${wantMax}x ${want} for ${give}.`] };
+  const maxUses = parseTradeOpt(opts.maxUses, "max-uses");
+  const xp = parseTradeOpt(opts.xp, "xp");
+  tree.write(
+    `${bpRel}/trading/${raw}.json`,
+    renderTradeJson({ want, wantMin, wantMax, give, maxUses, xp }),
+  );
+  const extras = [
+    maxUses === undefined ? null : `${maxUses} uses`,
+    xp === undefined ? null : `${xp} xp`,
+  ].filter((part) => part !== null);
+  const suffix = extras.length > 0 ? ` (${extras.join(", ")})` : "";
+  return { notes: [`Trade ${wantMin}-${wantMax}x ${want} for ${give}${suffix}.`] };
 }

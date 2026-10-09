@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process";
+import { runTool } from "../process.js";
 
 import type { BedrockConfig } from "../config.js";
 import { harnessCheck } from "../harness/check.js";
@@ -51,7 +51,7 @@ function bumpVersion(current: string, bump: string): string {
 
 function runGit(dir: string, args: string[]): Promise<{ ok: boolean; output: string }> {
   return new Promise((resolve) => {
-    const child = execFile("git", args, { cwd: dir });
+    const child = runTool("git", args, { cwd: dir });
     let out = "";
     child.stdout?.on("data", (chunk: Buffer | string) => {
       out += String(chunk);

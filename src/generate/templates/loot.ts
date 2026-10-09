@@ -7,6 +7,15 @@ export interface LootTemplateOptions {
   max: number;
 }
 
+export function renderLootTableJson(pools: number): string {
+  return renderJson({
+    pools: Array.from({ length: pools }, () => ({
+      rolls: 1,
+      entries: [{ type: "empty", weight: 1 }],
+    })),
+  });
+}
+
 export function renderLootJson(opts: LootTemplateOptions): string {
   return renderJson({
     pools: [

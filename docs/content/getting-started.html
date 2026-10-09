@@ -18,8 +18,17 @@ cd my-addon
 npm install</code></pre>
 <p>
   <code>bb init</code> writes the config, both manifests with fresh UUIDs, a working entry file, and
-  the texture registries. Answer the prompts, or pass <code>--here</code>, <code>--js</code>,
-  <code>--git</code>, and <code>--install</code> to skip them.
+  the texture registries. Answer the prompts, or pass a name plus flags to skip them.
+</p>
+<pre><code>bb init my-addon
+bb init my-addon my_addon
+bb init my-addon --builder ../bedrock-builder/aplok-bedrock-builder-0.2.0.tgz</code></pre>
+<p>
+  The optional second positional sets the identifier namespace; it defaults to the project name with
+  dashes converted to underscores. <code>--builder</code> points the generated
+  <code>package.json</code> at a local builder tarball or directory instead of the npm release,
+  useful before publishing. Other flags: <code>--here</code>, <code>--js</code>, <code>--git</code>,
+  <code>--install</code>, <code>--force</code>.
 </p>
 <h2>Look at what you got</h2>
 <pre><code>my-addon/

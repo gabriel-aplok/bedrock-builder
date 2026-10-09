@@ -80,4 +80,92 @@ describe("pack command", () => {
     expect(findings.some((entry) => entry.message.includes("duplicate"))).toBe(true);
     await expect(pack(fixture.config, {})).rejects.toBeInstanceOf(PackError);
   });
+
+  it("fails on an all-zeros header uuid", async () => {
+    const path = join(fixture.root, "packs", "BP", "manifest.json");
+    const parsed = JSON.parse(await readFile(path, "utf8"));
+    parsed.header.uuid = "00000000-0000-0000-0000-000000000000";
+    await writeFile(path, JSON.stringify(parsed));
+    await expect(pack(fixture.config, {})).rejects.toBeInstanceOf(PackError);
+  });
+
+  it("fails when min_engine_version is newer than known stable", async () => {
+    const path = join(fixture.root, "packs", "BP", "manifest.json");
+    const parsed = JSON.parse(await readFile(path, "utf8"));
+    parsed.header.min_engine_version = [9, 99, 0];
+    await writeFile(path, JSON.stringify(parsed));
+    const findings = await validatePackManifests(
+      join(fixture.root, "packs", "BP"),
+      join(fixture.root, "packs", "RP"),
+    );
+    expect(findings.some((entry) => entry.message.includes("newer than the known stable"))).toBe(
+      true,
+    );
+    await expect(pack(fixture.config, {})).rejects.toBeInstanceOf(PackError);
+  });
+
+  it("fails when the rp link points at the wrong bp uuid", async () => {
+    const bpPath = join(fixture.root, "packs", "BP", "manifest.json");
+    const rpPath = join(fixture.root, "packs", "RP", "manifest.json");
+    const rp = JSON.parse(await readFile(rpPath, "utf8"));
+    rp.dependencies = [{ uuid: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", version: [1, 0, 0] }];
+    await writeFile(rpPath, JSON.stringify(rp));
+    const findings = await validatePackManifests(
+      join(fixture.root, "packs", "BP"),
+      join(fixture.root, "packs", "RP"),
+    );
+    expect(findings.some((entry) => entry.message.includes("does not match the BP uuid"))).toBe(
+      true,
+    );
+    await expect(pack(fixture.config, {})).rejects.toBeInstanceOf(PackError);
+  });
+
+  it("fails when the rp link version drifts from the bp version", async () => {
+    const bpPath = join(fixture.root, "packs", "BP", "manifest.json");
+    const rpPath = join(fixture.root, "packs", "RP", "manifest.json");
+    const bp = JSON.parse(await readFile(bpPath, "utf8"));
+    const rp = JSON.parse(await readFile(rpPath, "utf8"));
+    rp.dependencies = [{ uuid: bp.header.uuid, version: [2, 0, 0] }];
+    await writeFile(rpPath, JSON.stringify(rp));
+    const findings = await validatePackManifests(
+      join(fixture.root, "packs", "BP"),
+      join(fixture.root, "packs", "RP"),
+    );
+    expect(findings.some((entry) => entry.message.includes("does not match the BP version"))).toBe(
+      true,
+    );
+  });
+
+  it("accepts string and triple versions interchangeably", async () => {
+    const bpPath = join(fixture.root, "packs", "BP", "manifest.json");
+    const rpPath = join(fixture.root, "packs", "RP", "manifest.json");
+    const bp = JSON.parse(await readFile(bpPath, "utf8"));
+    bp.header.version = "1.0.0";
+    bp.header.min_engine_version = "1.19.0";
+    await writeFile(bpPath, JSON.stringify(bp));
+    const rp = JSON.parse(await readFile(rpPath, "utf8"));
+    rp.header.version = "1.0.0";
+    rp.header.min_engine_version = "1.19.0";
+    rp.dependencies = [{ uuid: bp.header.uuid, version: "1.0.0" }];
+    await writeFile(rpPath, JSON.stringify(rp));
+    const findings = await validatePackManifests(
+      join(fixture.root, "packs", "BP"),
+      join(fixture.root, "packs", "RP"),
+    );
+    expect(findings).toEqual([]);
+  });
+
+  it("rejects malformed version strings", async () => {
+    const bpPath = join(fixture.root, "packs", "BP", "manifest.json");
+    const parsed = JSON.parse(await readFile(bpPath, "utf8"));
+    parsed.header.version = "1.0";
+    await writeFile(bpPath, JSON.stringify(parsed));
+    const findings = await validatePackManifests(
+      join(fixture.root, "packs", "BP"),
+      join(fixture.root, "packs", "RP"),
+    );
+    expect(
+      findings.some((entry) => entry.message.includes("header.version is missing or bad")),
+    ).toBe(true);
+  });
 });

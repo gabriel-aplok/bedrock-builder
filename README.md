@@ -116,6 +116,9 @@ The entry can be TypeScript or JavaScript. If omitted, `bb` probes `src/main.ts`
 | `bb ext --install`                     | Install extension dependencies locally.            |
 | `bb manifest`                          | Rewrite pack UUIDs and links.                      |
 | `bb version 1.1.0`                     | Update the project version.                        |
+| `bb update`                            | Update deps plus the server manifest version.      |
+| `bb completion [shell]`                | Print shell completions.                           |
+| `bb import [dir]`                      | Adopt a pack folder into a bb project.             |
 | `bb publish --bump minor --tag --push` | Run the release workflow.                          |
 
 Most build commands support `--json`. Add `--typecheck` to `build` or `ship` to run the project TypeScript check first.
@@ -158,7 +161,8 @@ Bundled samples include `tga-converter`, `emissive-fixer`, and `json-cleaner`. T
 
 ## Deployment
 
-The default `retail` target discovers common Bedrock installations. Use a custom game directory when needed:
+The default `retail` target discovers common Bedrock installations. Use `preview` for the
+Preview and Store Beta installs on Windows. Use a custom game directory when needed:
 
 ```json
 {

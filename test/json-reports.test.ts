@@ -51,6 +51,7 @@ describe("json reports", () => {
       "bp-manifest",
       "rp-manifest",
       "entry",
+      "scripts",
       "deploy",
     ]);
     expect(report.ok).toBe(true);

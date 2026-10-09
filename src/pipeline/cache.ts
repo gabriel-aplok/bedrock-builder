@@ -113,8 +113,8 @@ export class BuildCache {
     }
   }
 
-  async pruneEmptyDirs(root: string): Promise<void> {
-    this.prunedDirs += await sweepEmptyDirs(root);
+  async pruneEmptyDirs(root: string, keep: string[] = []): Promise<void> {
+    this.prunedDirs += await sweepEmptyDirs(root, keep);
   }
 
   async save(): Promise<void> {

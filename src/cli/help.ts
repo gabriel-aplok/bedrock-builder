@@ -15,18 +15,21 @@ Ship:
   publish             Ship, harness, optional bump, tag, push
 
 Make:
-  init <name>         Create a fresh add-on project
+  init <name> [namespace]  Create a fresh add-on project
+  import [dir]          Adopt a pack folder into a bb project
   new <type> [name]   Create a feature: BP plus RP plus registries
                       types: weapon | tool | armor | item | entity | block | recipe | loot
   manifest            Rewrite pack manifest uuids and names
   version <semver>    Set the project version in config plus manifests
+  update              Update deps plus the server manifest version
                       types: weapon | tool | armor | item | entity | block | recipe | loot | spawn | trade | dialogue | animation | equipment | feature | feature_rule | particle | fog | function | voxel_shape | biome | camera | item_catalog | sound | biomes_client | block_culling | dimension | ui
   folders             Pick canonical pack folders interactively
+  completion [shell]  Print shell completions: bash | zsh | powershell
 
 Inspect:
   ext                 List resolved extension path and status
                       --install installs per-extension node deps
-  check               Verify config, packs, entry, deploy target
+  check               Verify config, packs, entry, scripts, deploy target
   harness             Build then cross-check every dist reference
 
 Global options:
@@ -68,12 +71,13 @@ Command flags:
   check  --fix               Create missing dirs, manifests, entry
          --json               Print the check report as json
   harness --no-build          Skip the build, check the current dist
-          --strict            Fail on missing pack icons, unused lang keys
+          --strict            Fail on missing icons, unused lang, bad textures
          --json               Print the harness report as json
   folders (no flags, interactive)
   init   --dir <path>         Target directory (default: ./<name>)
          --here               Create into the current directory
          --target-version <v>  Minecraft target version (default 1.21.0)
+         --builder <path>    Local builder tgz or dir instead of npm
          --js                 Emit src/main.js instead of src/main.ts
          --git / --no-git    Run git init (default on when interactive)
          --install / --no-install  Run npm install (default off)
@@ -132,6 +136,12 @@ Command flags:
          --command <text>     Function command line
          --sound-file <path>  Sound file path
          --direction <dir>    Culling direction
+         --from <file>        Import the behavior body from a json file
+         --spawn-egg          Write a spawn egg item (entity)
+         --unlock <id>        Recipe unlock item id or context:name
+         --max-uses <n>       Trade max uses
+         --xp <n>             Trade xp reward
+         --pools <n>          Loot table pool count (1-16)
          --force              Overwrite conflicting files
          --dry-run            Print the plan, write nothing
          --list               List all generator types

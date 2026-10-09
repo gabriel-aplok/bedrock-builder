@@ -10,7 +10,7 @@ export interface BedrockConfig {
   packs: { bp: string; rp: string };
   entry: string;
   out: string;
-  deploy: { target: "retail" | "custom"; customPath: string | null };
+  deploy: { target: "retail" | "preview" | "custom"; customPath: string | null };
   minecraft?: { serverVersion?: string };
   extensions?: Array<ExtensionConfig | string>;
   worlds: string[];
@@ -112,9 +112,9 @@ export function fillDefaults(draft: Draft, base: string): BedrockConfig {
   const deployRaw = isObj(draft.deploy) ? draft.deploy : {};
   const want = deployRaw.target;
   const target = want === undefined ? "retail" : want;
-  if (target !== "retail" && target !== "custom") {
+  if (target !== "retail" && target !== "preview" && target !== "custom") {
     throw new ConfigError(
-      `deploy.target must be "retail" or "custom", got ${JSON.stringify(want)}.`,
+      `deploy.target must be "retail", "preview", or "custom", got ${JSON.stringify(want)}.`,
       2,
     );
   }

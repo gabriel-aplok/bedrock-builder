@@ -1,5 +1,5 @@
 import { readFile, readdir, stat, writeFile } from "node:fs/promises";
-import { execFile } from "node:child_process";
+import { runTool } from "../process.js";
 import { homedir } from "node:os";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -323,11 +323,7 @@ export async function installExtensionDeps(
     };
   }
   return new Promise((resolve) => {
-    // npm.cmd needs a shell to spawn on windows node.
-    const child = execFile(npmCommand(), EXTENSION_INSTALL_ARGS, {
-      cwd: extensionRoot,
-      shell: process.platform === "win32",
-    });
+    const child = runTool(npmCommand(), EXTENSION_INSTALL_ARGS, { cwd: extensionRoot });
     let output = "";
     child.stdout?.on("data", (chunk: Buffer | string) => {
       output += String(chunk);

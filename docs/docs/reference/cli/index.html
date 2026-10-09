@@ -128,7 +128,7 @@
     </tr>
     <tr>
       <td><code>check</code></td>
-      <td>Verify config, packs, entry, deploy target.</td>
+      <td>Verify config, packs, entry, scripts, deploy target.</td>
     </tr>
     <tr>
       <td><code>new &lt;type&gt; [name]</code></td>
@@ -143,12 +143,24 @@
       <td>Set the version in config plus manifests.</td>
     </tr>
     <tr>
+      <td><code>update</code></td>
+      <td>Update deps plus the server manifest version.</td>
+    </tr>
+    <tr>
       <td><code>harness</code></td>
       <td>Build then cross-check every dist reference.</td>
     </tr>
     <tr>
       <td><code>publish</code></td>
       <td>Ship, harness, optional bump, tag, push.</td>
+    </tr>
+    <tr>
+      <td><code>completion [shell]</code></td>
+      <td>Print shell completions for bash, zsh, or powershell.</td>
+    </tr>
+    <tr>
+      <td><code>import [dir]</code></td>
+      <td>Adopt a pack folder into a bb project.</td>
     </tr>
   </tbody>
 </table>
@@ -247,26 +259,50 @@
   Detects the layout, rewrites both manifests with consistent names and versions, and cross-links
   the RP dependency to the BP uuid.
 </p>
+<h2>import</h2>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb import [dir] [--force] [--dry-run] [--json]</code></pre></div>
+<p>
+  Adopts an existing pack folder, hand-made or from bridge., into a bb project. Reads names and
+  versions from the manifests and any Bedrock-OSS config already there, then writes the missing
+  <code>config.json</code> and <code>package.json</code>. Manifests are never rewritten. With an
+  existing <code>config.json</code>, only <code>--force</code> merges the bb settings into it.
+</p>
+<h2>completion</h2>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb completion [bash|zsh|powershell]</code></pre></div>
+<p>Prints a completion script for the given shell, bash by default. Source it from your profile:</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb completion bash >> ~/.bashrc
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">completion</span> zsh > ~/.zfunc/_bb
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">completion</span> powershell >> $PROFILE</code></pre></div>
 <h2>version</h2>
 <div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb version &lt;semver&gt; [--dry-run] [--json]</code></pre></div>
 <p>
   Writes one version to the config plus both manifests.
   <code>--dry-run</code> previews without writing.
 </p>
+<h2>update</h2>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb update [--dry-run] [--json]</code></pre></div>
+<p>
+  Updates <code>@minecraft/server</code> and <code>@aplok/bedrock-builder</code> to their latest
+  ranges, runs <code>npm install</code>, and syncs the BP manifest server version with the installed
+  one. Only declared dependencies are touched. <code>--dry-run</code> previews without writing.
+</p>
 <h2>harness</h2>
 <div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb harness [--no-build] [--strict] [--json]</code></pre></div>
 <p>
   Builds, then cross-checks every icon, texture, recipe, and spawn reference in
   <code>dist/</code>. <code>--no-build</code> checks the current <code>dist/</code> without
-  rebuilding. <code>--strict</code> also fails on missing pack icons and unused lang keys.
+  rebuilding. <code>--strict</code> also fails on missing pack icons, unused lang keys, and bad
+  textures.
 </p>
 <h2>init</h2>
-<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb init &lt;name&gt; [--dir &lt;path&gt;] [--here] [--target-version &lt;v&gt;] [--js] [--git] [--install] [--force] [--json]</code></pre></div>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb init &lt;name&gt; [namespace] [--dir &lt;path&gt;] [--here] [--target-version &lt;v&gt;] [--js] [--git] [--install] [--builder &lt;path&gt;] [--force] [--json]</code></pre></div>
 <p>
   Creates a fresh project with config, manifests, entry file, and registries.
   <code>--here</code> creates into the current directory. <code>--js</code> emits
   <code>src/main.js</code> instead of TypeScript. <code>--force</code> overwrites a non-empty
-  directory.
+  directory. The optional namespace sets the identifier prefix, defaulting to the project name.
+  <code>--builder</code> uses a local builder tarball or directory for the generated
+  <code>devDependency</code> instead of the npm release.
 </p>
  <nav class="pager"><a href="../../guides/troubleshooting/"><span>Previous</span>Troubleshooting</a><a href="../generators/" style="text-align:right"><span>Next</span>CLI: bb new</a></nav>
         <p class="edit-link">

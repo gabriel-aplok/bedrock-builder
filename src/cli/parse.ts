@@ -2,9 +2,10 @@ import { blankArgs, COMMANDS, type CliArgs, type Command } from "./args.js";
 
 // per-command value flags. generator flags live under "new", the rest
 // declare which commands accept them.
-const VALUE_FLAGS: Record<string, readonly Command[]> = {
+export const VALUE_FLAGS: Record<string, readonly Command[]> = {
   "--name": ["new", "manifest"],
   "--icon": ["new"],
+  "--from": ["new"],
   "--geometry": ["new"],
   "--texture": ["new"],
   "--mode": ["new"],
@@ -49,18 +50,23 @@ const VALUE_FLAGS: Record<string, readonly Command[]> = {
   "--group": ["new"],
   "--command": ["new"],
   "--sound-file": ["new"],
+  "--unlock": ["new"],
+  "--max-uses": ["new"],
+  "--xp": ["new"],
+  "--pools": ["new"],
   "--direction": ["new"],
   "--config": [],
   "--output": ["ship"],
   "--level": ["ship"],
   "--target-version": ["init"],
+  "--builder": ["init"],
   "--pack-version": ["manifest"],
   "--bump": ["publish"],
   "--dir": ["init", "manifest"],
 };
 
 // per-command toggle flags.
-const TOGGLE_FLAGS: Record<string, readonly Command[]> = {
+export const TOGGLE_FLAGS: Record<string, readonly Command[]> = {
   "--release": ["build", "run"],
   "--clean": ["build"],
   "--watch": ["run"],
@@ -78,8 +84,9 @@ const TOGGLE_FLAGS: Record<string, readonly Command[]> = {
   "--no-git": ["init"],
   "--no-install": ["init"],
   "--here": ["init"],
-  "--force": ["new", "init"],
-  "--dry-run": ["new", "init", "manifest", "version", "publish"],
+  "--force": ["new", "init", "import"],
+  "--spawn-egg": ["new"],
+  "--dry-run": ["new", "init", "manifest", "version", "publish", "update", "import"],
   "--list": ["new"],
   "-y": ["new"],
   "--yes": ["new"],
@@ -89,6 +96,7 @@ const TOGGLE_FLAGS: Record<string, readonly Command[]> = {
 const VALUE_KEY: Record<string, keyof CliArgs> = {
   "--name": "name",
   "--icon": "icon",
+  "--from": "from",
   "--geometry": "geometry",
   "--texture": "texture",
   "--mode": "mode",
@@ -133,11 +141,16 @@ const VALUE_KEY: Record<string, keyof CliArgs> = {
   "--group": "group",
   "--command": "commandLine",
   "--sound-file": "soundFile",
+  "--unlock": "unlock",
+  "--max-uses": "maxUses",
+  "--xp": "xp",
+  "--pools": "pools",
   "--direction": "direction",
   "--config": "configPath",
   "--output": "output",
   "--level": "level",
   "--target-version": "targetVersion",
+  "--builder": "builder",
   "--pack-version": "packVersion",
   "--bump": "bump",
   "--dir": "dir",
@@ -241,6 +254,9 @@ export function parseArgs(argv: readonly string[]): CliArgs {
       case "--force":
         args.force = true;
         break;
+      case "--spawn-egg":
+        args.spawnEgg = true;
+        break;
       case "--list":
         args.list = true;
         break;
@@ -304,6 +320,22 @@ export function parseArgs(argv: readonly string[]): CliArgs {
     if (args.command === "init") {
       if (args.initName === undefined) {
         args.initName = token;
+        continue;
+      }
+      if (args.initNamespace === undefined) {
+        args.initNamespace = token;
+        continue;
+      }
+    }
+    if (args.command === "completion") {
+      if (args.completionShell === undefined) {
+        args.completionShell = token;
+        continue;
+      }
+    }
+    if (args.command === "import") {
+      if (args.importDir === undefined) {
+        args.importDir = token;
         continue;
       }
     }

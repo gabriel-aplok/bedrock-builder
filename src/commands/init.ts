@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process";
+import { runTool } from "../process.js";
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve } from "node:path";
 
@@ -7,6 +7,7 @@ import { logger, printJson } from "../logger.js";
 import * as p from "../prompts.js";
 import { AbortError } from "./create-prompts.js";
 import { buildInitFiles } from "./init-files.js";
+import { deriveNamespace, validateNamespace } from "../generate/core/identifier.js";
 
 export interface InitOptions {
   // where to create. Defaults to ./<name>.
@@ -25,6 +26,10 @@ export interface InitOptions {
   installSet?: boolean | undefined;
   targetVersion?: string | undefined;
   json?: boolean | undefined;
+  // identifier namespace used for generated content ids.
+  namespace?: string | undefined;
+  // local builder package (tgz or dir) instead of the npm release.
+  builder?: string | undefined;
 }
 
 export interface InitReport {
@@ -69,15 +74,12 @@ function parseVersion(raw: string | undefined, fallback: string): string {
 }
 
 // resolve the latest published range for a dep, offline-safe fallback.
-async function latestRange(name: string, fallback: string): Promise<string> {
+export async function latestRange(name: string, fallback: string): Promise<string> {
   if (!/^@[a-z0-9-~][a-z0-9-._~]*\/[a-z0-9-~][a-z0-9-._~]*$/.test(name)) {
     return fallback;
   }
   return new Promise((resolve) => {
-    const child = execFile("npm", ["view", name, "version"], {
-      timeout: 10000,
-      shell: process.platform === "win32",
-    });
+    const child = runTool("npm", ["view", name, "version"], { timeout: 10000 });
     let out = "";
     child.stdout?.on("data", (chunk: Buffer | string) => {
       out += String(chunk);
@@ -107,10 +109,12 @@ export async function init(rawName: string, options: InitOptions = {}): Promise<
   const interactive =
     Boolean(process.stdout.isTTY) && rawName.trim() === "" && !(options.json ?? false);
   let name = rawName;
+  let namespace = options.namespace;
   if (interactive) {
     try {
       p.intro(pc.bgCyan(pc.black(" bb init ")));
       name = await askName();
+      namespace ??= await askNamespace(deriveNamespace(parseName(name)));
       options = {
         ...options,
         js: await askLanguage(),
@@ -135,6 +139,7 @@ export async function init(rawName: string, options: InitOptions = {}): Promise<
     }
   }
   const project = parseName(name);
+  const resolvedNamespace = parseNamespace(namespace ?? deriveNamespace(project));
   const targetVersion = parseVersion(options.targetVersion, "1.21.0");
   const cwd = process.cwd();
   const dir = options.here
@@ -151,13 +156,20 @@ export async function init(rawName: string, options: InitOptions = {}): Promise<
     );
   }
 
+  const builderLocal =
+    options.builder === undefined || options.builder.trim() === ""
+      ? null
+      : resolve(cwd, options.builder.trim());
   const [serverRange, builderRange] = await Promise.all([
     latestRange("@minecraft/server", "^2.0.0"),
-    latestRange("@aplok/bedrock-builder", "^1.0.0"),
+    builderLocal === null
+      ? latestRange("@aplok/bedrock-builder", "^1.0.0")
+      : Promise.resolve(`file:${builderLocal}`),
   ]);
 
   const files = buildInitFiles({
     name: project,
+    namespace: resolvedNamespace,
     targetVersion,
     minEngineVersion: targetVersion,
     version: "1.0.0",
@@ -167,7 +179,7 @@ export async function init(rawName: string, options: InitOptions = {}): Promise<
   });
   await mkdir(dir, { recursive: true });
   const spin = interactive ? p.spinner() : null;
-  spin?.start("Createing project");
+  spin?.start("Creating project");
   for (const file of files) {
     const dest = join(dir, file.rel);
     await mkdir(join(dest, ".."), { recursive: true });
@@ -177,7 +189,7 @@ export async function init(rawName: string, options: InitOptions = {}): Promise<
       await writeFile(dest, file.body, "utf8");
     }
   }
-  spin?.stop("Project createed");
+  spin?.stop("Project created");
 
   let git = false;
   if (options.git ?? true) {
@@ -190,8 +202,10 @@ export async function init(rawName: string, options: InitOptions = {}): Promise<
   if (options.install ?? false) {
     const npmSpin = interactive ? p.spinner() : null;
     npmSpin?.start("Running npm install");
-    installed = (await runNpmInstall(dir)) === 0;
+    const npmResult = await runNpmInstall(dir);
+    installed = npmResult.code === 0;
     if (interactive) npmSpin?.stop(installed ? "Dependencies installed" : "Install failed");
+    if (npmResult.output.trim() !== "") logger.info(npmResult.output.trim());
   }
 
   const report: InitReport = {
@@ -209,7 +223,7 @@ export async function init(rawName: string, options: InitOptions = {}): Promise<
     p.note(`cd ${shown}\nnpm install\nbb build\nbb run --watch`, "Next steps");
     p.outro(pc.green(`done: ${project} in ${dir}`));
   } else {
-    logger.success(`Createed ${project} in ${dir}`);
+    logger.success(`Created ${project} in ${dir}`);
     for (const file of report.files) logger.info(`  ${file}`);
     logger.info("Next: npm install, then bb build");
   }
@@ -232,6 +246,27 @@ async function askName(): Promise<string> {
   return (value as string).trim();
 }
 
+async function askNamespace(fallback: string): Promise<string> {
+  const value = await p.text({
+    message: "Namespace",
+    placeholder: fallback,
+    defaultValue: fallback,
+    validate: (text) => {
+      const hit = validateNamespace((text ?? "").trim() || fallback);
+      return hit === true ? undefined : hit;
+    },
+  });
+  if (p.isCancel(value)) throw new AbortError();
+  const trimmed = (value as string).trim();
+  return trimmed === "" ? fallback : trimmed;
+}
+
+function parseNamespace(raw: string): string {
+  const hit = validateNamespace(raw.trim());
+  if (hit !== true) throw new InitError(hit);
+  return raw.trim();
+}
+
 async function askLanguage(): Promise<boolean> {
   const value = await p.select({
     message: "Language",
@@ -252,21 +287,23 @@ async function askConfirm(message: string, initial = true): Promise<boolean> {
 
 function runGitInit(dir: string): Promise<boolean> {
   return new Promise((resolve) => {
-    const child = execFile("git", ["init"], { cwd: dir });
+    const child = runTool("git", ["init"], { cwd: dir });
     child.on("error", () => resolve(false));
     child.on("close", (code) => resolve(code === 0));
   });
 }
 
-function runNpmInstall(dir: string): Promise<number> {
+function runNpmInstall(dir: string): Promise<{ code: number; output: string }> {
   return new Promise((resolve) => {
-    const child = execFile("npm", ["install"], {
-      cwd: dir,
-      shell: process.platform === "win32",
+    const child = runTool("npm", ["install"], { cwd: dir });
+    let output = "";
+    child.stdout?.on("data", (chunk: Buffer | string) => {
+      output += String(chunk);
     });
-    child.stdout?.pipe(process.stdout);
-    child.stderr?.pipe(process.stderr);
-    child.on("error", () => resolve(1));
-    child.on("close", (code) => resolve(code ?? 1));
+    child.stderr?.on("data", (chunk: Buffer | string) => {
+      output += String(chunk);
+    });
+    child.on("error", () => resolve({ code: 1, output }));
+    child.on("close", (code) => resolve({ code: code ?? 1, output }));
   });
 }

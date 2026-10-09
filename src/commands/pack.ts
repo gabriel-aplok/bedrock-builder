@@ -32,7 +32,7 @@ export class PackError extends Error {
   }
 }
 
-export { validatePackManifests } from "../pipeline/manifest.js";
+export { manifestVersion, validatePackManifests } from "../pipeline/manifest.js";
 export type { ManifestFinding } from "../pipeline/manifest.js";
 
 const KB = 1024;

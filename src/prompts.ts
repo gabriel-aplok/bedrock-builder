@@ -117,6 +117,20 @@ function showCursor(): void {
   process.stdout.write("\u001b[?25h");
 }
 
+// cursor must be on the last line of the block. clears the
+// whole block, then the caller prints one summary line.
+function clearBlock(lines: number): void {
+  for (let i = 0; i < lines; i++) {
+    process.stdout.write("\r\u001b[K");
+    if (i < lines - 1) process.stdout.write("\u001b[A");
+  }
+  process.stdout.write("\r");
+}
+
+function summarize(message: string, result: string): void {
+  out(`${pc.green("✓")} ${message} ${pc.gray("›")} ${result}`);
+}
+
 export interface TextOptions {
   message: string;
   placeholder?: string | undefined;
@@ -141,11 +155,13 @@ export async function text(options: TextOptions): Promise<string | symbol> {
       process.stdout.write(`\r\u001b[${2 + value.length}C`);
     };
     const finish = (result: string | symbol): void => {
-      process.stdout.write("\r\u001b[K");
-      if (error !== null) process.stdout.write("\u001b[B\r\u001b[K");
-      process.stdout.write("\u001b[B\r\u001b[K");
+      if (error !== null) process.stdout.write("\u001b[B");
+      clearBlock(error !== null ? 3 : 2);
       showCursor();
       reader.close();
+      if (result !== CANCEL && typeof result === "string") {
+        summarize(options.message, result || options.placeholder || "—");
+      }
       resolve(result);
     };
     hideCursor();
@@ -198,9 +214,10 @@ export async function confirm(options: ConfirmOptions): Promise<boolean | symbol
       process.stdout.write(`\r\u001b[K? ${options.message} (${yes}/${no})`);
     };
     const finish = (result: boolean | symbol): void => {
-      process.stdout.write("\r\u001b[K");
+      clearBlock(1);
       showCursor();
       reader.close();
+      if (result !== CANCEL) summarize(options.message, result ? "yes" : "no");
       resolve(result);
     };
     hideCursor();
@@ -265,9 +282,14 @@ export async function select(options: SelectOptions): Promise<string | symbol> {
       process.stdout.write(`\u001b[${options.options.length + 1}A`);
     };
     const finish = (result: string | symbol): void => {
-      process.stdout.write(`\u001b[${options.options.length + 1}B`);
+      process.stdout.write(`\u001b[${options.options.length}B`);
+      clearBlock(options.options.length + 1);
       showCursor();
       reader.close();
+      if (result !== CANCEL && typeof result === "string") {
+        const label = options.options.find((item) => item.value === result)?.label ?? result;
+        summarize(options.message, label);
+      }
       resolve(result);
     };
     hideCursor();
@@ -322,9 +344,16 @@ export async function multiselect(options: MultiselectOptions): Promise<string[]
       process.stdout.write(`\u001b[${lines}A`);
     };
     const finish = (result: string[] | symbol, lines: number): void => {
-      process.stdout.write(`\u001b[${lines}B`);
+      process.stdout.write(`\u001b[${lines - 1}B`);
+      clearBlock(lines);
       showCursor();
       reader.close();
+      if (result !== CANCEL) {
+        const labels = (result as string[]).map(
+          (value) => options.options.find((item) => item.value === value)?.label ?? value,
+        );
+        summarize(options.message, labels.length > 0 ? labels.join(", ") : "none");
+      }
       resolve(result);
     };
     hideCursor();

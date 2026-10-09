@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import type { BedrockConfig } from "./config.js";
 import { logger } from "./logger.js";
 
-const RUNTIME_MODULES = [
+export const RUNTIME_MODULES = [
   "@minecraft/server",
   "@minecraft/server-ui",
   "@minecraft/server-net",
@@ -23,7 +23,11 @@ export interface BuildResult {
 }
 
 function bundlePath(config: BedrockConfig): string {
-  return join(config.out, "packs", "BP", "scripts", "main.js");
+  return join(bundleDir(config), "main.js");
+}
+
+export function bundleDir(config: BedrockConfig): string {
+  return join(config.out, "packs", "BP", "scripts");
 }
 
 function esbuildFlags(config: BedrockConfig, dev: boolean, dest: string): EsbuildOptions {

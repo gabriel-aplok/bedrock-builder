@@ -31,8 +31,51 @@ function collectIds(value: unknown, bucket: string[], depth = 0): void {
 }
 
 export interface HarnessOptions {
-  // extra warnings become failures: missing pack icons, unused lang keys.
+  // extra warnings become failures: missing pack icons, unused lang keys,
+  // atlas textures without files, oversized or non-power-of-two pngs.
   strict?: boolean | undefined;
+}
+
+// max texture edge in strict mode. larger textures load but
+// cost memory on low-end devices.
+const MAX_TEXTURE_EDGE = 1024;
+
+// png width and height from the ihdr chunk, no decode needed.
+function pngSize(bytes: Uint8Array): { width: number; height: number } | null {
+  if (bytes.length < 33) return null;
+  const magic = [137, 80, 78, 71, 13, 10, 26, 10];
+  for (let i = 0; i < magic.length; i++) {
+    if (bytes[i] !== magic[i]) return null;
+  }
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  if (view.getUint32(8) !== 13) return null;
+  if (String.fromCharCode(bytes[12]!, bytes[13]!, bytes[14]!, bytes[15]!) !== "IHDR") {
+    return null;
+  }
+  return { width: view.getUint32(16), height: view.getUint32(20) };
+}
+
+function isPowerOfTwo(n: number): boolean {
+  return n > 0 && (n & (n - 1)) === 0;
+}
+
+// texture paths listed in an atlas file, relative to the rp root.
+function atlasTextures(doc: unknown): string[] {
+  if (typeof doc !== "object" || doc === null) return [];
+  const data = (doc as Record<string, unknown>).texture_data;
+  if (typeof data !== "object" || data === null) return [];
+  const out: string[] = [];
+  for (const entry of Object.values(data as Record<string, unknown>)) {
+    if (typeof entry !== "object" || entry === null) continue;
+    const textures = (entry as Record<string, unknown>).textures;
+    if (typeof textures === "string") out.push(textures);
+    else if (Array.isArray(textures)) {
+      for (const item of textures) {
+        if (typeof item === "string") out.push(item);
+      }
+    }
+  }
+  return out;
 }
 
 // load a built dist, parse every json, and cross-check references.
@@ -168,6 +211,23 @@ export async function harnessCheck(
     }
   }
 
+  // every texture path listed in an atlas must resolve to a file.
+  // strict only: generated atlas keys point at art the user
+  // adds later, so default mode stays green for fresh output.
+  const rpFiles = new Set(
+    entries.filter((e) => e.rel.startsWith(rpRoot)).map((e) => e.rel.slice(rpRoot.length)),
+  );
+  const textureCandidates = (path: string): string[] => {
+    const clean = path.replace(/^\.\//, "");
+    if (/\.(png|tga|jpg|jpeg)$/i.test(clean)) return [clean];
+    return [clean, `${clean}.png`, `${clean}.tga`, `${clean}.jpg`, `${clean}.jpeg`];
+  };
+  const atlasDocs: [string, unknown][] = [];
+  for (const [rel, doc] of jsonDocs) {
+    if (!rel.endsWith("item_texture.json") && !rel.endsWith("terrain_texture.json")) continue;
+    atlasDocs.push([rel, doc]);
+  }
+
   // spawn rule identifiers should match a defined entity.
   const entities = new Set<string>();
   for (const [rel, doc] of jsonDocs) {
@@ -223,6 +283,29 @@ export async function harnessCheck(
   if (options.strict ?? false) {
     const strictFindings = await checkStrict(entries, jsonDocs);
     for (const message of strictFindings) fail(message);
+    for (const [rel, doc] of atlasDocs) {
+      for (const texture of atlasTextures(doc)) {
+        if (!textureCandidates(texture).some((c) => rpFiles.has(c))) {
+          fail(`${rel}: atlas texture "${texture}" has no file`);
+        }
+      }
+    }
+    for (const entry of entries) {
+      if (!entry.rel.toLowerCase().endsWith(".png")) continue;
+      const bytes = await readFile(entry.abs).catch(() => null);
+      if (bytes === null) continue;
+      const size = pngSize(new Uint8Array(bytes));
+      if (size === null) {
+        fail(`${entry.rel}: not a readable png`);
+        continue;
+      }
+      if (!isPowerOfTwo(size.width) || !isPowerOfTwo(size.height)) {
+        fail(`${entry.rel}: ${size.width}x${size.height} is not power-of-two`);
+      }
+      if (size.width > MAX_TEXTURE_EDGE || size.height > MAX_TEXTURE_EDGE) {
+        fail(`${entry.rel}: ${size.width}x${size.height} exceeds ${MAX_TEXTURE_EDGE}px`);
+      }
+    }
   }
 
   return { files: entries.length, jsonFiles, failures };

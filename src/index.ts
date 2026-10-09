@@ -12,6 +12,12 @@ export type { InitOptions, InitReport } from "./commands/init.js";
 export { ManifestError, manifest } from "./commands/manifest.js";
 export type { ManifestOptions, ManifestReport } from "./commands/manifest.js";
 export { VersionError, version } from "./commands/version.js";
+export { UpdateError, update } from "./commands/update.js";
+export { CompletionError, completion, parseCompletionShell } from "./commands/completion.js";
+export type { CompletionShell } from "./commands/completion.js";
+export { ImportError, importProject } from "./commands/import.js";
+export type { ImportOptions, ImportReport } from "./commands/import.js";
+export type { UpdateOptions, UpdateReport, UpdatedDep } from "./commands/update.js";
 export type { VersionOptions, VersionReport } from "./commands/version.js";
 export { detectPackLayout, rewriteManifest, rewriteManifests } from "./manifest/rewrite.js";
 export type {
@@ -21,7 +27,7 @@ export type {
   RewrittenManifest,
 } from "./manifest/rewrite.js";
 
-export { BundlerError, buildBundle, buildBundleWithWatch } from "./bundler.js";
+export { BundlerError, buildBundle, buildBundleWithWatch, RUNTIME_MODULES } from "./bundler.js";
 export type { BuildResult, BuildOptions as BundleBuildOptions } from "./bundler.js";
 
 export { runBounded } from "./concurrency.js";
@@ -29,6 +35,8 @@ export { copyPackFile, copyPackFiles } from "./copier.js";
 export { toPosix } from "./files/tree.js";
 export { syncTree } from "./sync.js";
 export { TypecheckError, parseDiagnostics, typecheck } from "./typecheck.js";
+export { checkScriptImports } from "./script-check.js";
+export type { ScriptCheck } from "./script-check.js";
 export type { TypeDiagnostic, TypecheckResult } from "./typecheck.js";
 
 export { BuildCache } from "./pipeline/cache.js";
@@ -147,6 +155,7 @@ export { planFunction } from "./generate/function.js";
 export { planItem } from "./generate/item.js";
 export { planItemCatalog } from "./generate/item_catalog.js";
 export { planLoot } from "./generate/loot.js";
+export { planLootTable } from "./generate/loot_table.js";
 export { planParticle } from "./generate/particle.js";
 export { planRecipe } from "./generate/recipe.js";
 export { planSound } from "./generate/sound.js";

@@ -5,6 +5,10 @@ import type { Tree } from "./core/tree.js";
 import type { CreateOptions, GeneratorResult } from "./core/types.js";
 import { renderLootJson } from "./templates/loot.js";
 
+export function lootFolder(kind: "entity" | "block" | "chest"): string {
+  return kind === "block" ? "blocks" : kind === "chest" ? "chests" : "entities";
+}
+
 function parseLootKind(raw: string): "entity" | "block" | "chest" {
   const kind = raw.toLowerCase();
   if (kind === "entity" || kind === "block" || kind === "chest") return kind;
@@ -31,7 +35,7 @@ export function planLoot(tree: Tree, config: BedrockConfig, opts: CreateOptions)
   const scope = openPlan(config, opts);
   const { raw, names: n, bpRel } = scope;
   const kind = parseLootKind(opts.lootKind ?? "entity");
-  const folder = kind === "block" ? "blocks" : kind === "chest" ? "chests" : "entities";
+  const folder = lootFolder(kind);
   const drop = opts.result?.trim() ? parseDropId(opts.result, "result") : n.identifier;
   const rolls = parseDropRange(opts.rolls, 1, "rolls");
   if (rolls < 1) throw new GenerateError(`rolls must be >= 1, got ${opts.rolls}.`);

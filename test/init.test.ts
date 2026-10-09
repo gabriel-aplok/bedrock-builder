@@ -1,6 +1,6 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { init, InitError } from "../src/commands/init.js";
@@ -94,5 +94,41 @@ describe("init", () => {
     await expect(
       init("demo-addon", { dir: join(parent, "x"), targetVersion: "1.21" }),
     ).rejects.toBeInstanceOf(InitError);
+  });
+
+  it("uses an explicit namespace instead of the derived one", async () => {
+    const parent = await tempDir();
+    const dir = join(parent, "demo-addon");
+    await init("demo-addon", { dir, namespace: "guns" });
+
+    const config = JSON.parse(await readFile(join(dir, "config.json"), "utf8"));
+    expect(config.namespace).toBe("guns");
+  });
+
+  it("derives the namespace from the name by default", async () => {
+    const parent = await tempDir();
+    const dir = join(parent, "demo-addon");
+    await init("demo-addon", { dir });
+
+    const config = JSON.parse(await readFile(join(dir, "config.json"), "utf8"));
+    expect(config.namespace).toBe("demo_addon");
+  });
+
+  it("rejects a bad namespace", async () => {
+    const parent = await tempDir();
+    await expect(
+      init("demo-addon", { dir: join(parent, "x"), namespace: "Bad NS" }),
+    ).rejects.toBeInstanceOf(InitError);
+  });
+
+  it("points the builder at a local package with --builder", async () => {
+    const parent = await tempDir();
+    const dir = join(parent, "demo-addon");
+    await init("demo-addon", { dir, builder: "../local-builder.tgz", install: false });
+
+    const pkg = JSON.parse(await readFile(join(dir, "package.json"), "utf8"));
+    expect(pkg.devDependencies["@aplok/bedrock-builder"]).toBe(
+      `file:${resolve(process.cwd(), "../local-builder.tgz")}`,
+    );
   });
 });

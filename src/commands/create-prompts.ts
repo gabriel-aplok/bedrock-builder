@@ -63,6 +63,10 @@ export async function askOptions(
     case "loot":
       await askLoot(out, config, name);
       break;
+    case "loot_table":
+      out.lootKind ??= await askChoice("Table folder", ["entity", "block", "chest"], "chest");
+      out.pools ??= await askCount("Pools", 3);
+      break;
     case "spawn":
       out.spawnCategory ??= await askChoice(
         "Category",
@@ -183,6 +187,7 @@ async function askArmor(out: CreateOptions, config: BedrockConfig, name: string)
 
 async function askEntity(out: CreateOptions, config: BedrockConfig, name: string): Promise<void> {
   out.mode ??= await askChoice("Render", ["2d", "3d"], "3d");
+  out.spawnEgg ??= await askConfirm("Write a spawn egg item?", true);
   out.displayName ??= await askLine("Display name", toDisplayName(name));
   out.texture ??= await askLine("Texture path", `textures/entity/${name}`);
   if ((out.mode ?? "3d").toLowerCase() === "3d") {
@@ -222,6 +227,7 @@ async function askRecipe(out: CreateOptions, config: BedrockConfig, name: string
     out.ingredients ??= await askLine("Ingredient ids", "minecraft:stick");
   }
   out.count ??= await askCount("Result count", 1);
+  out.unlock ??= await askLine("Unlock (item id or context:name, blank for default)", "");
 }
 
 async function askLoot(out: CreateOptions, config: BedrockConfig, name: string): Promise<void> {
@@ -313,4 +319,10 @@ async function askChoice(message: string, options: string[], initial?: string): 
   });
   if (p.isCancel(value)) abort();
   return value as string;
+}
+
+async function askConfirm(message: string, initial = true): Promise<boolean> {
+  const value = await p.confirm({ message, initialValue: initial });
+  if (p.isCancel(value)) abort();
+  return value as boolean;
 }

@@ -1,5 +1,43 @@
 <h1>Changelog</h1>
 <p>Release history for Bedrock Builder.</p>
+<h2>0.2.0</h2>
+<ul>
+  <li>
+    Replace <code>picocolors</code>, <code>tsup</code>, <code>archiver</code>, and
+    <code>@clack/prompts</code> with in-repo implementations.
+  </li>
+  <li>Fix cache pruning deleting the bundler output directory during parallel builds.</li>
+  <li>Run <code>git</code> and <code>npm</code> through argument arrays, not shell strings.</li>
+  <li>Run checks on Ubuntu and Windows.</li>
+  <li>
+    Add <code>bb init &lt;name&gt; [namespace]</code> and
+    <code>bb init --builder &lt;path&gt;</code>.
+  </li>
+  <li>Check atlas texture files and png sizes in <code>bb harness --strict</code>.</li>
+  <li>
+    Check entry <code>@minecraft/*</code> imports and server version drift in <code>bb check</code>.
+  </li>
+  <li>Check manifest UUIDs, engine version, and the RP to BP link on <code>bb ship</code>.</li>
+  <li>
+    Accept manifest versions as <code>1.0.0</code> or <code>[1, 0, 0]</code> everywhere, and reject
+    malformed strings.
+  </li>
+  <li>
+    Import behavior bodies from existing files with
+    <code>bb new &lt;type&gt; --from &lt;file&gt;</code>.
+  </li>
+  <li>
+    Update declared deps, reinstall, and sync the manifest server version with
+    <code>bb update</code>.
+  </li>
+  <li>Print shell completions with <code>bb completion [bash|zsh|powershell]</code>.</li>
+  <li>Adopt existing pack folders with <code>bb import [dir]</code>.</li>
+  <li>Deploy to Preview and Store Beta installs with a <code>preview</code> target.</li>
+  <li>
+    Add a <code>loot_table</code> generator plus <code>spawn-egg</code>, recipe <code>unlock</code>,
+    and trade <code>max-uses</code>/<code>xp</code> options.
+  </li>
+</ul>
 <h2>0.1.0 - first release</h2>
 <ul>
   <li>

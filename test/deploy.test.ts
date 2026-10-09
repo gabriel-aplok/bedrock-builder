@@ -151,4 +151,50 @@ describe("deploy command (one-shot)", () => {
       await rm(home, { recursive: true, force: true });
     }
   });
+
+  it("resolves the windows preview launcher home", async () => {
+    const appData = await mkdtemp(join(tmpdir(), "bedrock-fake-appdata-"));
+    const savedAppData = process.env.APPDATA;
+    const savedLocal = process.env.LOCALAPPDATA;
+    try {
+      const root = join(
+        appData,
+        "Minecraft Bedrock Preview",
+        "Users",
+        "Shared",
+        "games",
+        "com.mojang",
+      );
+      await mkdir(root, { recursive: true });
+      process.env.APPDATA = appData;
+      delete process.env.LOCALAPPDATA;
+      setPlatformForTests("win32");
+      const preview: BedrockConfig = {
+        ...box.config,
+        deploy: { target: "preview", customPath: null },
+      };
+      const targets = await resolveDeployTarget(preview);
+      expect(targets.root).toBe(root);
+    } finally {
+      setPlatformForTests(null);
+      if (savedAppData === undefined) delete process.env.APPDATA;
+      else process.env.APPDATA = savedAppData;
+      if (savedLocal === undefined) delete process.env.LOCALAPPDATA;
+      else process.env.LOCALAPPDATA = savedLocal;
+      await rm(appData, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects preview on non-windows platforms", async () => {
+    setPlatformForTests("linux");
+    try {
+      const preview: BedrockConfig = {
+        ...box.config,
+        deploy: { target: "preview", customPath: null },
+      };
+      await expect(resolveDeployTarget(preview)).rejects.toBeInstanceOf(DeployTargetError);
+    } finally {
+      setPlatformForTests(null);
+    }
+  });
 });

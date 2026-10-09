@@ -7,6 +7,7 @@ export type CreateType =
   | "block"
   | "recipe"
   | "loot"
+  | "loot_table"
   | "spawn"
   | "trade"
   | "dialogue"
@@ -36,6 +37,7 @@ export const CREATE_TYPES: readonly CreateType[] = [
   "block",
   "recipe",
   "loot",
+  "loot_table",
   "spawn",
   "trade",
   "dialogue",
@@ -60,6 +62,17 @@ export const CREATE_TYPES: readonly CreateType[] = [
 export interface CreateOptions {
   type?: CreateType | undefined;
   name?: string | undefined;
+  // import the bp definition from an existing json file.
+  from?: string | undefined;
+  // write a spawn egg item for the entity.
+  spawnEgg?: boolean | undefined;
+  // recipe unlock: item id or context:name.
+  unlock?: string | undefined;
+  // trade limits.
+  maxUses?: number | undefined;
+  xp?: number | undefined;
+  // loot table pool count.
+  pools?: number | undefined;
   icon?: string | undefined;
   displayName?: string | undefined;
   mode?: string | undefined;

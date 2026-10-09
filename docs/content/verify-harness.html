@@ -25,9 +25,11 @@ bb harness --json</code></pre>
 </p>
 <h2>Strict mode</h2>
 <p>
-  <code>--strict</code> turns two warnings into failures: a missing <code>pack_icon.png</code> in
-  either pack dir, and any lang key that nothing references. Default mode skips both. Use strict in
-  CI to catch dead keys and missing icons before release.
+  <code>--strict</code> turns warnings into failures: a missing <code>pack_icon.png</code> in either
+  pack dir, any lang key that nothing references, any atlas texture without a file, and any png that
+  is unreadable, not power-of-two, or larger than 1024px on either edge. Default mode skips all of
+  them, so fresh generator output stays green until art lands. Use strict in CI to catch dead keys,
+  missing icons, and heavy textures before release.
 </p>
 <h2>Failure output</h2>
 <p>

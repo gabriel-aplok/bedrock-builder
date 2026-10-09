@@ -162,6 +162,19 @@ describe("BuildCache", () => {
     expect(again.prunedFiles).toBe(1);
   });
 
+  it("pruneEmptyDirs keeps the bundler scripts dir while esbuild writes", async () => {
+    const cache = new BuildCache();
+    await cache.open(box.out, box.root, false);
+
+    // empty scripts dir, as seen when the bundler created it
+    // but esbuild has not written main.js yet.
+    const scripts = txt(box.out, "packs", "BP", "scripts");
+    await mkdir(scripts, { recursive: true });
+    await cache.pruneEmptyDirs(txt(box.out, "packs", "BP"), [scripts]);
+
+    expect(await gone(scripts)).toBe(false);
+  });
+
   it("drop removes one entry and its output without touching siblings", async () => {
     const cache = new BuildCache();
     await cache.open(box.out, box.root, false);

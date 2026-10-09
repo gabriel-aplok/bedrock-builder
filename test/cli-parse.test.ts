@@ -36,6 +36,32 @@ describe("parseArgs ,  new command", () => {
     expect(got.unknown).toEqual([]);
   });
 
+  it("parses --from, --spawn-egg, --unlock, --max-uses, --xp, --pools", () => {
+    const got = parseArgs([
+      "new",
+      "item",
+      "ruby",
+      "--from",
+      "./sword.json",
+      "--spawn-egg",
+      "--unlock",
+      "minecraft:stick",
+      "--max-uses",
+      "12",
+      "--xp",
+      "5",
+      "--pools",
+      "3",
+    ]);
+    expect(got.from).toBe("./sword.json");
+    expect(got.spawnEgg).toBe(true);
+    expect(got.unlock).toBe("minecraft:stick");
+    expect(got.maxUses).toBe("12");
+    expect(got.xp).toBe("5");
+    expect(got.pools).toBe("3");
+    expect(got.unknown).toEqual([]);
+  });
+
   it("parses new --list without a type", () => {
     const got = parseArgs(["new", "--list"]);
     expect(got.command).toBe("new");

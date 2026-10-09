@@ -16,6 +16,9 @@ export const COMMANDS = [
   "version",
   "harness",
   "publish",
+  "update",
+  "completion",
+  "import",
 ] as const;
 export type Command = (typeof COMMANDS)[number];
 
@@ -41,10 +44,14 @@ export interface CliArgs {
   push: boolean;
   output: string | undefined;
   level: string | undefined;
-  // init <name>.
+  // init <name> [namespace].
   initName: string | undefined;
+  initNamespace: string | undefined;
+  builder: string | undefined;
   // version <semver>.
   genVersion: string | undefined;
+  completionShell: string | undefined;
+  importDir: string | undefined;
   dir: string | undefined;
   here: boolean;
   targetVersion: string | undefined;
@@ -103,6 +110,12 @@ export interface CliArgs {
   commandLine: string | undefined;
   soundFile: string | undefined;
   direction: string | undefined;
+  from: string | undefined;
+  spawnEgg: boolean;
+  unlock: string | undefined;
+  maxUses: string | undefined;
+  xp: string | undefined;
+  pools: string | undefined;
   force: boolean;
   dryRun: boolean;
   yes: boolean;
@@ -159,6 +172,12 @@ export interface CreateFlags {
   commandLine: string | undefined;
   soundFile: string | undefined;
   direction: string | undefined;
+  from: string | undefined;
+  spawnEgg: boolean;
+  unlock: string | undefined;
+  maxUses: string | undefined;
+  xp: string | undefined;
+  pools: string | undefined;
   force: boolean;
   dryRun: boolean;
   yes: boolean;
@@ -188,7 +207,11 @@ export function blankArgs(): CliArgs {
     output: undefined,
     level: undefined,
     initName: undefined,
+    initNamespace: undefined,
+    builder: undefined,
     genVersion: undefined,
+    completionShell: undefined,
+    importDir: undefined,
     dir: undefined,
     here: false,
     targetVersion: undefined,
@@ -247,6 +270,12 @@ export function blankArgs(): CliArgs {
     commandLine: undefined,
     soundFile: undefined,
     direction: undefined,
+    from: undefined,
+    spawnEgg: false,
+    unlock: undefined,
+    maxUses: undefined,
+    xp: undefined,
+    pools: undefined,
     force: false,
     dryRun: false,
     yes: false,
@@ -306,6 +335,12 @@ export function toCreateFlags(args: CliArgs): CreateFlags {
     commandLine: args.commandLine,
     soundFile: args.soundFile,
     direction: args.direction,
+    from: args.from,
+    spawnEgg: args.spawnEgg,
+    unlock: args.unlock,
+    maxUses: args.maxUses,
+    xp: args.xp,
+    pools: args.pools,
     force: args.force,
     dryRun: args.dryRun,
     yes: args.yes,

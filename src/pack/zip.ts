@@ -1,10 +1,9 @@
 // minimal zip writer for .mcaddon files. replaces the archiver
 // dependency, local headers plus deflate data plus central
-// directory, enough for minecraft and standard unzip tools
-// just avoiding supply chains lol.
+// directory, enough for minecraft and standard unzip tools.
 
 import { createWriteStream } from "node:fs";
-import { readdir, stat } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { deflateRawSync } from "node:zlib";
 
@@ -61,7 +60,6 @@ export async function collectDir(root: string, prefix: string): Promise<ZipEntry
         out.push({ name: `${zipName}/`, data: new Uint8Array(0), dir: true });
         await walk(full, zipName);
       } else if (info.isFile()) {
-        const { readFile } = await import("node:fs/promises");
         out.push({ name: zipName, data: new Uint8Array(await readFile(full)), dir: false });
       }
     }

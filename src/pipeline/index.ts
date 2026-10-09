@@ -1,4 +1,5 @@
 import { runBounded } from "../concurrency.js";
+import { bundleDir } from "../bundler.js";
 import type { BedrockConfig } from "../config.js";
 import { logger } from "../logger.js";
 import { BuildCache } from "./cache.js";
@@ -69,7 +70,7 @@ export async function runPipeline(
   let prunedDirs = 0;
   if (cache) {
     await cache.pruneStale();
-    await cache.pruneEmptyDirs(destRoot(config, "BP"));
+    await cache.pruneEmptyDirs(destRoot(config, "BP"), [bundleDir(config)]);
     await cache.pruneEmptyDirs(destRoot(config, "RP"));
     prunedFiles = cache.prunedFiles;
     prunedDirs = cache.prunedDirs;

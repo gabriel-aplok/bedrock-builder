@@ -12,6 +12,10 @@ bb check --json</code></pre>
   <li>Both pack dirs exist on disk.</li>
   <li>Both <code>manifest.json</code> files exist.</li>
   <li>Entry file exists at <code>bb.entry</code>.</li>
+  <li>
+    Entry <code>@minecraft/*</code> imports resolve to known runtime modules, and
+    <code>@minecraft/server</code> matches the BP manifest dependency plus the installed version.
+  </li>
   <li>Deploy target resolves to a real <code>com.mojang</code> folder.</li>
   <li>
     Extension tools on PATH when enabled. Warns only, never fails. Audio copies through without it.

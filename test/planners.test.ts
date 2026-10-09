@@ -31,6 +31,7 @@ import { planRecipe } from "../src/generate/recipe.js";
 import { planSpawn } from "../src/generate/spawn.js";
 import { planTrade } from "../src/generate/trade.js";
 import { planLoot } from "../src/generate/loot.js";
+import { planLootTable } from "../src/generate/loot_table.js";
 import type { CreateOptions } from "../src/generate/core/types.js";
 import { setupFixture } from "./helpers.js";
 
@@ -268,6 +269,22 @@ describe("pure planners", () => {
       expect(desc.render_controllers).toEqual(["controller.render.item_sprite"]);
       expect(desc.scripts.animate).toEqual(["flying"]);
     });
+
+    it("spawn egg: writes an egg item wired to the entity", () => {
+      const { paths, json, text } = stage(planEntity, { name: "goblin", spawnEgg: true });
+      expect(paths).toContain("packs/BP/items/goblin_spawn_egg.item.json");
+      const egg = json("packs/BP/items/goblin_spawn_egg.item.json")["minecraft:item"];
+      expect(egg.description.identifier).toBe(`${NS}:goblin_spawn_egg`);
+      expect(egg.components["minecraft:spawn_egg"]).toEqual({
+        entity_identifier: `${NS}:goblin`,
+      });
+      expect(text("packs/RP/texts/en_US.lang")).toContain(`item.${NS}:goblin_spawn_egg=`);
+    });
+
+    it("skips the egg item by default", () => {
+      const { paths } = stage(planEntity, { name: "goblin" });
+      expect(paths.some((p) => p.includes("spawn_egg") && p.endsWith(".item.json"))).toBe(false);
+    });
   });
 
   describe("block", () => {
@@ -328,6 +345,34 @@ describe("pure planners", () => {
         { item: "minecraft:diamond" },
       ]);
       expect(body.result).toEqual({ item: `${NS}:ruby_sword`, count: 1 });
+    });
+
+    it("unlocks on the first ingredient by default", () => {
+      const { json } = stage(planRecipe, {
+        name: "ruby_sword",
+        ingredients: "minecraft:stick,minecraft:diamond",
+      });
+      const body = json("packs/BP/recipes/ruby_sword.json")["minecraft:recipe_shapeless"];
+      expect(body.unlock).toEqual([{ item: "minecraft:stick" }]);
+    });
+
+    it("accepts an explicit unlock item or context", () => {
+      const { json } = stage(planRecipe, {
+        name: "ruby_sword",
+        ingredients: "minecraft:stick",
+        unlock: "minecraft:diamond",
+      });
+      expect(json("packs/BP/recipes/ruby_sword.json")["minecraft:recipe_shapeless"].unlock).toEqual(
+        [{ item: "minecraft:diamond" }],
+      );
+      const { json: ctx } = stage(planRecipe, {
+        name: "diver_soup",
+        ingredients: "minecraft:kelp",
+        unlock: "context:player_in_water",
+      });
+      expect(ctx("packs/BP/recipes/diver_soup.json")["minecraft:recipe_shapeless"].unlock).toEqual([
+        { context: "player_in_water" },
+      ]);
     });
 
     it("furnace: writes input plus output on the furnace tag", () => {
@@ -442,6 +487,43 @@ describe("pure planners", () => {
       const trade = json("packs/BP/trading/ruby_trade.json").tiers[0].trades[0];
       expect(trade.wants[0].item).toBe("minecraft:emerald");
       expect(trade.gives[0].item).toBe("minecraft:diamond");
+      expect(trade.max_uses).toBeUndefined();
+      expect(trade.trader_exp).toBeUndefined();
+    });
+
+    it("adds max uses and xp when asked", () => {
+      const { json } = stage(planTrade, {
+        name: "ruby_trade",
+        want: "minecraft:emerald",
+        give: "minecraft:diamond",
+        maxUses: 12,
+        xp: 5,
+      });
+      const trade = json("packs/BP/trading/ruby_trade.json").tiers[0].trades[0];
+      expect(trade.max_uses).toBe(12);
+      expect(trade.trader_exp).toBe(5);
+    });
+  });
+
+  describe("loot_table", () => {
+    it("writes empty pools ready to fill", () => {
+      const { paths, json } = stage(planLootTable, { name: "dungeon", pools: 2 });
+      expect(paths).toEqual(["packs/BP/loot_tables/chests/dungeon.json"]);
+      const pools = json("packs/BP/loot_tables/chests/dungeon.json").pools;
+      expect(pools).toHaveLength(2);
+      expect(pools[0]).toEqual({
+        rolls: 1,
+        entries: [{ type: "empty", weight: 1 }],
+      });
+    });
+
+    it("follows the loot kind folder and rejects bad pool counts", () => {
+      const block = stage(planLootTable, { name: "ore", lootKind: "block" });
+      expect(block.paths).toEqual(["packs/BP/loot_tables/blocks/ore.json"]);
+      const tree = new Tree(fx.config.__configDir);
+      expect(() => planLootTable(tree, fx.config, { name: "ore", pools: 0 })).toThrow(
+        GenerateError,
+      );
     });
   });
 

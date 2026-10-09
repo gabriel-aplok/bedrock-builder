@@ -1,5 +1,5 @@
 import { readdir, rmdir, stat } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve, sep } from "node:path";
 
 import { runBounded } from "../../concurrency.js";
 import { removeEntry } from "../../files/io.js";
@@ -36,7 +36,7 @@ export async function removeOutput(root: string, out: string): Promise<void> {
   await removeEntry(join(root, ...out.split("/")));
 }
 
-export async function pruneEmptyDirs(root: string): Promise<number> {
+export async function pruneEmptyDirs(root: string, keep: string[] = []): Promise<number> {
   let dirs: string[] = [];
   try {
     dirs = await listDirs(root);
@@ -45,7 +45,10 @@ export async function pruneEmptyDirs(root: string): Promise<number> {
   }
   dirs.sort((a, b) => b.length - a.length);
   let pruned = 0;
+  const kept = keep.map((entry) => resolve(entry));
   for (const dir of dirs) {
+    const current = resolve(dir);
+    if (kept.some((entry) => entry === current || entry.startsWith(current + sep))) continue;
     try {
       if ((await readdir(dir)).length === 0) {
         await rmdir(dir);

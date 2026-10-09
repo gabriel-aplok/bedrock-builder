@@ -82,12 +82,19 @@
 </p>
 <div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb new weapon fire_sword --mode 3d --icon sword
 <span class="prompt" data-copy-skip>$ </span>bb <span class="f">new</span> block glow_block <span class="k">--light</span> 12
-<span class="prompt" data-copy-skip>$ </span>bb <span class="f">new</span> recipe steel_ingot <span class="k">--recipe-kind</span> furnace <span class="k">--result</span> steel_ingot</code></pre></div>
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">new</span> recipe steel_ingot <span class="k">--recipe-kind</span> furnace <span class="k">--result</span> steel_ingot
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">new</span> item ruby <span class="k">--from</span> ./sword.json</code></pre></div>
+<p>
+  <code>--from</code> imports the behavior body from an existing json file instead of generating
+  one. Registries, lang entries, and sidecars are still wired from the flags. Identifiers in the
+  imported file move into the project namespace. The file must share a top-level key with the
+  generated behavior file, like <code>minecraft:item</code>.
+</p>
 <h2>Types</h2>
 <p>
   weapon, tool, armor, item, entity, block, recipe, loot, spawn, trade, dialogue, animation,
   equipment, feature, feature_rule, particle, fog, function, voxel_shape, biome, camera,
-  item_catalog, sound, biomes_client, block_culling, dimension, ui.
+  item_catalog, sound, biomes_client, block_culling, dimension, ui, loot_table.
 </p>
 <h2>Common flags</h2>
 <table>
@@ -121,6 +128,14 @@
     <tr>
       <td><code>--texture &lt;path&gt;</code></td>
       <td>3D texture path or block texture key.</td>
+    </tr>
+    <tr>
+      <td><code>--from &lt;file&gt;</code></td>
+      <td>Import the behavior body from a json file.</td>
+    </tr>
+    <tr>
+      <td><code>--spawn-egg</code></td>
+      <td>Write a spawn egg item for the entity.</td>
     </tr>
     <tr>
       <td><code>--force</code></td>
@@ -247,6 +262,22 @@
     <tr>
       <td><code>--max &lt;n&gt;</code></td>
       <td>Loot drop max count.</td>
+    </tr>
+    <tr>
+      <td><code>--unlock &lt;id&gt;</code></td>
+      <td>Recipe unlock item id or context:name. Defaults to the first ingredient.</td>
+    </tr>
+    <tr>
+      <td><code>--pools &lt;n&gt;</code></td>
+      <td>Loot table pool count, 1 to 16. Default is 3.</td>
+    </tr>
+    <tr>
+      <td><code>--max-uses &lt;n&gt;</code></td>
+      <td>Trade max uses.</td>
+    </tr>
+    <tr>
+      <td><code>--xp &lt;n&gt;</code></td>
+      <td>Trade xp reward.</td>
     </tr>
   </tbody>
 </table>

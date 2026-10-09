@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import { BundlerError } from "../bundler.js";
 import { build } from "../commands/build.js";
 import { clean } from "../commands/clean.js";
+import { CompletionError, completion, parseCompletionShell } from "../commands/completion.js";
+import { importProject, ImportError } from "../commands/import.js";
 import { create } from "../commands/create.js";
 import { deploy } from "../commands/deploy.js";
 import { diff } from "../commands/diff.js";
@@ -16,6 +18,7 @@ import { init, InitError } from "../commands/init.js";
 import { manifest, ManifestError } from "../commands/manifest.js";
 import { pack, PackError } from "../commands/pack.js";
 import { publish, PublishError } from "../commands/publish.js";
+import { update, UpdateError } from "../commands/update.js";
 import { version as bumpVersion, VersionError } from "../commands/version.js";
 import { watch } from "../commands/watch.js";
 import { ConfigError, loadConfig, loadConfigLenient } from "../config.js";
@@ -83,11 +86,27 @@ export async function dispatch(args: CliArgs): Promise<number> {
     return 0;
   }
 
+  if (args.command === "import") {
+    try {
+      await importProject(args.importDir, {
+        force: args.force,
+        dryRun: args.dryRun,
+        json: args.json,
+      });
+      return 0;
+    } catch (err) {
+      if (err instanceof ImportError) return report(err.message, err.exitCode);
+      return report(err instanceof Error ? err.message : String(err), 1);
+    }
+  }
+
   // init and manifest run before any config is loaded.
   // init creates a project, manifest fixes an existing one.
   if (args.command === "init") {
     try {
       await init(args.initName ?? "", {
+        namespace: args.initNamespace,
+        builder: args.builder,
         dir: args.dir,
         here: args.here,
         force: args.force,
@@ -134,6 +153,16 @@ export async function dispatch(args: CliArgs): Promise<number> {
       return 0;
     } catch (err) {
       if (err instanceof ManifestError) return report(err.message, err.exitCode);
+      return report(err instanceof Error ? err.message : String(err), 1);
+    }
+  }
+
+  if (args.command === "completion") {
+    try {
+      process.stdout.write(completion(parseCompletionShell(args.completionShell)));
+      return 0;
+    } catch (err) {
+      if (err instanceof CompletionError) return err.exitCode;
       return report(err instanceof Error ? err.message : String(err), 1);
     }
   }
@@ -217,6 +246,9 @@ export async function dispatch(args: CliArgs): Promise<number> {
       case "clean":
         await clean(config, { json: args.json });
         return 0;
+      case "update":
+        await update(config, { dryRun: args.dryRun, json: args.json });
+        return 0;
       case "diff":
         await diff(config, { json: args.json });
         return 0;
@@ -281,6 +313,12 @@ export async function dispatch(args: CliArgs): Promise<number> {
           commandLine: flags.commandLine,
           soundFile: flags.soundFile,
           direction: flags.direction,
+          from: flags.from,
+          spawnEgg: flags.spawnEgg,
+          unlock: flags.unlock,
+          maxUses: asNumber(flags.maxUses),
+          xp: asNumber(flags.xp),
+          pools: asNumber(flags.pools),
           force: flags.force,
           dryRun: flags.dryRun,
           yes: flags.yes,
@@ -318,6 +356,9 @@ export async function dispatch(args: CliArgs): Promise<number> {
       return report(err.message, err.exitCode);
     }
     if (err instanceof PublishError) {
+      return report(err.message, err.exitCode);
+    }
+    if (err instanceof UpdateError) {
       return report(err.message, err.exitCode);
     }
     if (err instanceof BundlerError) {

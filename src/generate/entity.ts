@@ -1,5 +1,7 @@
 import type { BedrockConfig } from "../config.js";
-import { sidecarPlan, isMode, modelRefs, writeLangTail } from "./core/kit.js";
+import { deriveNames } from "./core/names.js";
+import { sidecarPlan, isMode, modelRefs, writeItemFeature, writeLangTail } from "./core/kit.js";
+import { VERSIONS } from "./core/versions.js";
 import { stripPng } from "./core/names.js";
 import { openPlan } from "./core/setup.js";
 import type { Tree } from "./core/tree.js";
@@ -71,6 +73,24 @@ export function planEntity(
     [`entity.${n.identifier}.name`, n.displayName],
     [`item.spawn_egg.entity.${n.identifier}.name`, `Spawn ${n.displayName}`],
   ]);
+  if (opts.spawnEgg ?? false) {
+    const egg = deriveNames(config.namespace, `${raw}_spawn_egg`);
+    writeItemFeature(
+      tree,
+      bpRel,
+      rpRel,
+      `${raw}_spawn_egg`,
+      egg,
+      egg.atlasKey,
+      VERSIONS.item,
+      "items",
+      {
+        "minecraft:spawn_egg": { entity_identifier: n.identifier },
+        "minecraft:display_name": { value: `Spawn ${n.displayName}` },
+      },
+    );
+    notes.push(`Spawn egg item at items/${raw}_spawn_egg.item.json.`);
+  }
   notes.push(`No spawn rules ship with this. Use the egg or /summon ${n.identifier}.`);
 
   if (sidecar.equipment !== null) {

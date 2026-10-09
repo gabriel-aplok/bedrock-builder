@@ -8,7 +8,10 @@ bb ship --output ./releases/my-addon.mcaddon --level 9</code></pre>
 <h2>What ship does</h2>
 <ul>
   <li>Runs a release build first. There is no dev mode pack.</li>
-  <li>Validates both manifests. Failures stop the zip with exit code 4.</li>
+  <li>
+    Validates both manifests: required fields, real UUIDs, engine version, and the RP to BP link.
+    Failures stop the zip with exit code 4.
+  </li>
   <li>
     Zips <code>dist/packs/BP/</code> as <code>&lt;name&gt;_BP/</code> and
     <code>dist/packs/RP/</code> as <code>&lt;name&gt;_RP/</code> inside the archive.
