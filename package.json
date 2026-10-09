@@ -1,0 +1,86 @@
+{
+  "name": "@aplok/bedrock-builder",
+  "version": "0.1.0",
+  "description": "Build tools for Minecraft Bedrock add-ons.",
+  "keywords": [
+    "minecraft",
+    "bedrock",
+    "mcaddon",
+    "addon",
+    "bb",
+    "build-tool",
+    "esbuild",
+    "typescript"
+  ],
+  "homepage": "https://github.com/gabriel-aplok/bedrock-builder#readme",
+  "bugs": {
+    "url": "https://github.com/gabriel-aplok/bedrock-builder/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabriel-aplok/bedrock-builder.git"
+  },
+  "license": "Zlib",
+  "author": "trenbankai",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "bedrock-builder": "dist/cli.js",
+    "bb": "dist/cli.js"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup && npm run build:dts",
+    "build:prod": "node scripts/build-prod.mjs",
+    "build:dts": "tsc --emitDeclarationOnly",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:typecheck": "vitest --typecheck run",
+    "perf": "node scripts/perf-budget.mjs",
+    "docs": "node scripts/build-docs.mjs && node scripts/build-sitemap.mjs && node scripts/build-icons.mjs",
+    "docs:check": "node scripts/check-docs.mjs",
+    "icons": "node scripts/build-icons.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "pack:dry": "npm pack --dry-run",
+    "prepublishOnly": "npm run build:prod"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.8.1",
+    "archiver": "^8.0.0",
+    "chokidar": "^5.0.0",
+    "esbuild": "^0.28.2",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/archiver": "^8.0.0",
+    "@types/node": "^26.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3",
+    "prettier": "^3.6.2"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false
+}

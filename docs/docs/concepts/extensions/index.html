@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Extensions - Bedrock Builder docs</title>
+    <meta name="description" content="User enabled processors with match plus remap, pre, transform, post hooks." />
+    <meta name="theme-color" content="#000000" />
+    <link rel="canonical" href="https://bedrock.trenbankai.dev/docs/concepts/extensions/" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../../../assets/icon-32.png" />
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png" />
+    <link rel="manifest" href="../../../assets/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bedrock Builder" />
+    <meta property="og:title" content="Extensions - Bedrock Builder docs" />
+    <meta property="og:description" content="User enabled processors with match plus remap, pre, transform, post hooks." />
+    <meta property="og:url" content="https://bedrock.trenbankai.dev/docs/concepts/extensions/" />
+    <meta property="og:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Extensions - Bedrock Builder docs" />
+    <meta name="twitter:description" content="User enabled processors with match plus remap, pre, transform, post hooks." />
+    <meta name="twitter:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <link rel="stylesheet" href="../../../styles.css" />
+  </head>
+  <body data-page="extensions">
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="../../../">Bedrock Builder</a>
+        <nav>
+          <a href="../../../docs/">Docs</a>
+          <a href="../../../#workflow">Workflow</a>
+          <a href="../../../#generators">Generators</a>
+          <a href="../../../#start">Install</a>
+          <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+          <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        </nav>
+        <a class="cta" href="../../../#start">Get Started</a>
+      </div>
+    </header>
+
+    <div class="docs-wrap">
+      <aside class="sidebar">
+        <p class="group">docs</p>
+        <a href="../../" data-page="index">Introduction</a>
+        <a href="../../getting-started/" data-page="getting-started">Getting Started</a>
+        <p class="group">concepts</p>
+        <a href="../../concepts/workspace-layout/" data-page="workspace-layout"
+          >Workspace Layout</a
+        >
+        <a href="../../concepts/packs-and-manifests/" data-page="packs-and-manifests"
+          >Packs and Manifests</a
+        >
+        <a href="../../concepts/pipeline/" data-page="pipeline">Build Pipeline</a>
+        <a href="../../concepts/extensions/" data-page="extensions">Extensions</a>
+        <a href="../../concepts/comparison/" data-page="comparison">Tool Comparison</a>
+        <p class="group">guides</p>
+        <a href="../../guides/hot-reload/" data-page="hot-reload">Hot Reload Setup</a>
+        <a href="../../guides/ship/" data-page="ship">Shipping a .mcaddon</a>
+        <a href="../../guides/custom-deploy/" data-page="custom-deploy">Custom Deploy Path</a>
+        <a href="../../guides/verify-check/" data-page="verify-check">Verify with bb check</a>
+        <a href="../../guides/preview-diff/" data-page="preview-diff">Preview with bb diff</a>
+        <a href="../../guides/verify-harness/" data-page="verify-harness"
+          >Verify with bb harness</a
+        >
+        <a href="../../guides/release-publish/" data-page="release-publish"
+          >Release with bb publish</a
+        >
+        <a href="../../guides/troubleshooting/" data-page="troubleshooting">Troubleshooting</a>
+        <p class="group">reference</p>
+        <a href="../../reference/cli/" data-page="cli">CLI: bb</a>
+        <a href="../../reference/generators/" data-page="generators">CLI: bb new</a>
+        <a href="../../reference/config/" data-page="config">Config Schema</a>
+        <a href="../../reference/exit-codes/" data-page="exit-codes">Exit Codes</a>
+        <a href="../../reference/api/" data-page="api">API Reference</a>
+        <a href="../../changelog/" data-page="changelog">Changelog</a>
+      </aside>
+      <main class="doc">
+        <h1>Extensions</h1>
+<p>
+  Extensions are user enabled file processors. Nothing loads by default. List a name or path in the
+  <code>extensions</code> array and the build loads it, resolves it, and runs its hooks on matching
+  files.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>{
+  "bb": {
+    "extensions": ["./tools/minify-json", "my-pack-tools"]
+  }
+}</code></pre></div>
+<h2>Resolution order</h2>
+<ul>
+  <li>
+    Relative path from the project dir, plus <code>index.mjs</code> and
+    <code>index.js</code> probes.
+  </li>
+  <li>Project <code>node_modules</code>.</li>
+  <li>Project <code>.builder/extensions/&lt;name&gt;</code>.</li>
+  <li>Global <code>~/.bedrock-builder/extensions/&lt;name&gt;</code>.</li>
+  <li>Dev-only repo <code>extensions/</code> samples, excluded from npm.</li>
+</ul>
+<p>
+  Missing or broken extensions warn and skip. The build never fails because of an extension.
+  <code>bb ext</code> lists each spec with its resolved path plus ok, missing, or broken status.
+  Missing node deps show a hint to run <code>bb ext --install</code>. Extensions can also report
+  their own health checks, such as an external tool they need.
+</p>
+<h2>Per-extension dependencies</h2>
+<p>
+  Each extension keeps its own <code>node_modules</code>. Declare what it needs in its manifest and
+  install with one command. Core stays lean.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>{
+  "name": "json-cleaner",
+  "entry": "index.mjs",
+  "dependencies": { "jsonc-parser": "^3.3.1" }
+}</code></pre></div>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb ext --install</code></pre></div>
+<p>
+  Installs each enabled extension's deps into its own folder with
+  <code>--no-save</code>. Never touches the core package or the project root.
+</p>
+<h2>Processor hooks</h2>
+<p>
+  Each processor declares a <code>name</code> plus a <code>match(file)</code> function. Four
+  optional hooks run in order:
+</p>
+<ul>
+  <li><code>remap(file)</code> returns a new output path or null. Runs before the cache check.</li>
+  <li><code>pre(file, ctx)</code> runs before the file is read. Use it for setup or validation.</li>
+  <li>
+    <code>transform(bytes, file, ctx)</code> maps input bytes to output bytes. Return null to keep
+    the input unchanged.
+  </li>
+  <li>
+    <code>post(file, ctx)</code> runs after the output is written. Use it for logging or side files.
+  </li>
+</ul>
+<p>
+  A processor that throws in <code>match</code> is skipped for that file with a warning. A processor
+  that throws in <code>pre</code>, <code>transform</code>, or <code>post</code> warns and the
+  pipeline keeps the last good bytes. Same name replaces the old entry, so an extension can override
+  a default or another extension.
+</p>
+<h2>Minimal extension</h2>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>export default {
+  name: "minify-json",
+  match: (file) => file.rel.endsWith(".json"),
+  transform: (bytes) => {
+    const text = new TextDecoder().decode(bytes);
+    const min = JSON.stringify(JSON.parse(text));
+    return new TextEncoder().encode(min);
+  },
+};</code></pre></div>
+<p>
+  Save it as <code>tools/minify-json/index.mjs</code>, add <code>"./tools/minify-json"</code> to
+  <code>extensions</code>, and every JSON file compacts on build. Return null from
+  <code>transform</code> when the file needs no change.
+</p>
+<h2>Bundled samples</h2>
+<ul>
+  <li><code>tga-converter</code> converts pack png and jpg textures to tga, except pack icons.</li>
+  <li>Audio conversion can be provided by a private extension through ffmpeg.</li>
+  <li>
+    <code>emissive-fixer</code> zeroes rgb on fully transparent png pixels, fixing emissive bleed
+    from editors that leave color data behind.
+  </li>
+  <li>
+    <code>json-cleaner</code> removes JSON comments, and can strip root <code>$schema</code> fields
+    or minify files.
+  </li>
+</ul>
+<p>
+  Each sample can carry two manifests. <code>extension.json</code> owns the builder entry point,
+  <code>package.json</code> owns npm metadata and dependencies. Deps merge from both files, and a
+  conflicting entry warns and keeps the <code>extension.json</code> value.
+</p>
+<p>
+  Copy a sample folder into your project, add its path to
+  <code>extensions</code>, and it runs on matching files. Factory extensions receive helpers from bb
+  itself, so they work with no installed dep. That covers global-only installs too.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>export default function myExtension({ settings }) {
+  return {
+    name: "my-extension",
+    match: (file) => file.rel.endsWith(".png"),
+    transform: (content) => doWork(content, settings),
+  };
+}</code></pre></div>
+<h2>Json cleaner settings</h2>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>{
+  "bb": {
+    "extensions": [
+      {
+        "name": "json-cleaner",
+        "settings": { "stripSchemas": true, "minify": true }
+      }
+    ]
+  }
+}</code></pre></div>
+<p>
+  Both settings default to false. The extension runs on every JSON file and leaves unchanged files
+  alone.
+</p>
+<h2>Per-extension settings</h2>
+<p>
+  Use an object when an extension needs settings. String entries still work and use an empty
+  settings object.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>{
+  "bb": {
+    "extensions": [
+      {
+        "name": "emissive-fixer",
+        "settings": { "stripPackIcons": false }
+      }
+    ]
+  }
+}</code></pre></div>
+<h2>Default processors</h2>
+<ul>
+  <li><code>normalize-text</code> unifies line endings and encoding for text files.</li>
+  <li><code>validate-json</code> parses JSON and warns on invalid files.</li>
+  <li><code>raw-copy</code> is the fallback that copies anything unmatched.</li>
+</ul>
+<p>
+  Core texture and audio helpers stay exported for extension authors. Nothing loads them unless an
+  extension calls them.
+</p>
+ <nav class="pager"><a href="../pipeline/"><span>Previous</span>Build Pipeline</a><a href="../comparison/" style="text-align:right"><span>Next</span>Tool Comparison</a></nav>
+        <p class="edit-link">
+          <a href="https://github.com/gabriel-aplok/bedrock-builder/tree/main/docs/content/extensions.html"
+            >Edit this page</a
+          >
+        </p>
+      </main>
+    </div>
+
+    <footer>
+      <p>
+        <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+        <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        <a href="https://www.npmjs.com/package/@aplok/bedrock-builder">npm</a>
+      </p>
+      <p>Built for Minecraft Bedrock developers. zlib licensed.</p>
+    </footer>
+    <script>
+      document.querySelectorAll(".sidebar a[data-page]").forEach((a) => {
+        if (a.getAttribute("data-page") === document.body.dataset.page) a.classList.add("active");
+      });
+      document.querySelectorAll(".codeblock").forEach((block) => {
+        const btn = block.querySelector(".copy-btn");
+        const code = block.querySelector("code");
+        if (!btn || !code) return;
+        btn.addEventListener("click", async () => {
+          const clone = code.cloneNode(true);
+          clone.querySelectorAll("[data-copy-skip]").forEach((el) => el.remove());
+          const text = clone.innerText;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const holder = document.createElement("pre");
+            holder.textContent = text;
+            holder.style.position = "fixed";
+            holder.style.opacity = "0";
+            document.body.appendChild(holder);
+            const range = document.createRange();
+            range.selectNodeContents(holder);
+            const sel = getSelection();
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(range);
+              document.execCommand("copy");
+              sel.removeAllRanges();
+            }
+            holder.remove();
+          }
+          btn.classList.add("copied");
+          btn.setAttribute("aria-label", "Copied");
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.setAttribute("aria-label", "Copy code");
+          }, 1500);
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+<h1>Workspace Layout</h1>
+<p>
+  <code>bb init</code> writes a project that builds on the first run. This page explains each file
+  and folder.
+</p>
+<pre><code>my-addon/
+  config.json                 project config, read by every command
+  package.json                scripts plus @minecraft/server dep
+  tsconfig.json               strict, noEmit, includes src/
+  src/main.ts                 script entry, bundled by esbuild
+  packs/BP/                   behavior pack sources
+  packs/RP/                   resource pack sources
+  dist/                       build output, gitignored</code></pre>
+<h2>config.json</h2>
+<p>
+  Every command except <code>init</code>, <code>version</code>, and <code>manifest</code> loads this
+  file. It holds the project name, version, pack paths, entry file, output folder, and deploy
+  target. Full schema: <a href="{{DOCS}}reference/config/">Config Schema</a>.
+</p>
+<h2>src/</h2>
+<p>
+  The entry file defaults to <code>src/main.ts</code>. Use <code>--js</code> at create time for
+  <code>src/main.js</code> instead. <code>bb build</code> bundles the entry into
+  <code>dist/packs/BP/scripts/main.js</code> with <code>@minecraft/server</code> packages kept
+  external.
+</p>
+<h2>packs/</h2>
+<p>
+  <code>packs/BP/</code> holds behavior files: entities, items, blocks, recipes, loot, spawn rules,
+  functions. <code>packs/RP/</code> holds resource files: textures, models, sounds, UI. Run
+  <code>bb folders</code> for an interactive picker that creates the canonical subfolders, so no
+  guessing of singular versus plural names.
+</p>
+<h2>dist/</h2>
+<p>
+  Build output only. <code>bb build</code> writes <code>dist/packs/BP/</code> and
+  <code>dist/packs/RP/</code>. <code>bb clean</code> removes <code>dist/</code> plus the build
+  cache. Never edit files in <code>dist/</code>. The next build overwrites them.
+</p>

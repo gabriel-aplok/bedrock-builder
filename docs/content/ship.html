@@ -1,0 +1,35 @@
+<h1>Shipping a .mcaddon</h1>
+<p>
+  <code>bb ship</code> runs a release build, validates both manifests, and zips the packs into one
+  shareable file.
+</p>
+<pre><code>bb ship
+bb ship --output ./releases/my-addon.mcaddon --level 9</code></pre>
+<h2>What ship does</h2>
+<ul>
+  <li>Runs a release build first. There is no dev mode pack.</li>
+  <li>Validates both manifests. Failures stop the zip with exit code 4.</li>
+  <li>
+    Zips <code>dist/packs/BP/</code> as <code>&lt;name&gt;_BP/</code> and
+    <code>dist/packs/RP/</code> as <code>&lt;name&gt;_RP/</code> inside the archive.
+  </li>
+  <li>Default output is <code>dist/&lt;name&gt;-&lt;version&gt;.mcaddon</code>.</li>
+  <li>
+    Default compression is 6. <code>--level 0</code> stores raw, <code>--level 9</code> compresses
+    hardest.
+  </li>
+</ul>
+<h2>Publish flow</h2>
+<pre><code>bb publish --bump minor --tag --push</code></pre>
+<p>
+  <code>bb publish</code> optionally bumps the version first, then ships, harnesses, tags, and
+  pushes. <code>--dry-run</code> prints the plan and runs nothing. <code>--typecheck</code> runs
+  <code>tsc --noEmit</code> before shipping.
+</p>
+<h2>Verify before shipping</h2>
+<pre><code>bb check
+bb harness</code></pre>
+<p>
+  <code>bb check</code> verifies the project. <code>bb harness</code> builds and cross-checks every
+  icon, texture, recipe, and spawn reference in <code>dist/</code>. Ship both green before sharing.
+</p>

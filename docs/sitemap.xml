@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://bedrock.trenbankai.dev/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/getting-started/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/concepts/workspace-layout/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/concepts/packs-and-manifests/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/concepts/pipeline/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/concepts/extensions/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/concepts/comparison/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/guides/hot-reload/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/guides/ship/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/guides/custom-deploy/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/guides/verify-check/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/guides/preview-diff/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/guides/verify-harness/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/guides/release-publish/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/guides/troubleshooting/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/reference/cli/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/reference/generators/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/reference/config/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/reference/exit-codes/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/reference/api/</loc></url>
+  <url><loc>https://bedrock.trenbankai.dev/docs/changelog/</loc></url>
+</urlset>

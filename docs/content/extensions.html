@@ -1,0 +1,150 @@
+<h1>Extensions</h1>
+<p>
+  Extensions are user enabled file processors. Nothing loads by default. List a name or path in the
+  <code>extensions</code> array and the build loads it, resolves it, and runs its hooks on matching
+  files.
+</p>
+<pre><code>{
+  "bb": {
+    "extensions": ["./tools/minify-json", "my-pack-tools"]
+  }
+}</code></pre>
+<h2>Resolution order</h2>
+<ul>
+  <li>
+    Relative path from the project dir, plus <code>index.mjs</code> and
+    <code>index.js</code> probes.
+  </li>
+  <li>Project <code>node_modules</code>.</li>
+  <li>Project <code>.builder/extensions/&lt;name&gt;</code>.</li>
+  <li>Global <code>~/.bedrock-builder/extensions/&lt;name&gt;</code>.</li>
+  <li>Dev-only repo <code>extensions/</code> samples, excluded from npm.</li>
+</ul>
+<p>
+  Missing or broken extensions warn and skip. The build never fails because of an extension.
+  <code>bb ext</code> lists each spec with its resolved path plus ok, missing, or broken status.
+  Missing node deps show a hint to run <code>bb ext --install</code>. Extensions can also report
+  their own health checks, such as an external tool they need.
+</p>
+<h2>Per-extension dependencies</h2>
+<p>
+  Each extension keeps its own <code>node_modules</code>. Declare what it needs in its manifest and
+  install with one command. Core stays lean.
+</p>
+<pre><code>{
+  "name": "json-cleaner",
+  "entry": "index.mjs",
+  "dependencies": { "jsonc-parser": "^3.3.1" }
+}</code></pre>
+<pre><code>bb ext --install</code></pre>
+<p>
+  Installs each enabled extension's deps into its own folder with
+  <code>--no-save</code>. Never touches the core package or the project root.
+</p>
+<h2>Processor hooks</h2>
+<p>
+  Each processor declares a <code>name</code> plus a <code>match(file)</code> function. Four
+  optional hooks run in order:
+</p>
+<ul>
+  <li><code>remap(file)</code> returns a new output path or null. Runs before the cache check.</li>
+  <li><code>pre(file, ctx)</code> runs before the file is read. Use it for setup or validation.</li>
+  <li>
+    <code>transform(bytes, file, ctx)</code> maps input bytes to output bytes. Return null to keep
+    the input unchanged.
+  </li>
+  <li>
+    <code>post(file, ctx)</code> runs after the output is written. Use it for logging or side files.
+  </li>
+</ul>
+<p>
+  A processor that throws in <code>match</code> is skipped for that file with a warning. A processor
+  that throws in <code>pre</code>, <code>transform</code>, or <code>post</code> warns and the
+  pipeline keeps the last good bytes. Same name replaces the old entry, so an extension can override
+  a default or another extension.
+</p>
+<h2>Minimal extension</h2>
+<pre><code>export default {
+  name: "minify-json",
+  match: (file) => file.rel.endsWith(".json"),
+  transform: (bytes) => {
+    const text = new TextDecoder().decode(bytes);
+    const min = JSON.stringify(JSON.parse(text));
+    return new TextEncoder().encode(min);
+  },
+};</code></pre>
+<p>
+  Save it as <code>tools/minify-json/index.mjs</code>, add <code>"./tools/minify-json"</code> to
+  <code>extensions</code>, and every JSON file compacts on build. Return null from
+  <code>transform</code> when the file needs no change.
+</p>
+<h2>Bundled samples</h2>
+<ul>
+  <li><code>tga-converter</code> converts pack png and jpg textures to tga, except pack icons.</li>
+  <li>Audio conversion can be provided by a private extension through ffmpeg.</li>
+  <li>
+    <code>emissive-fixer</code> zeroes rgb on fully transparent png pixels, fixing emissive bleed
+    from editors that leave color data behind.
+  </li>
+  <li>
+    <code>json-cleaner</code> removes JSON comments, and can strip root <code>$schema</code> fields
+    or minify files.
+  </li>
+</ul>
+<p>
+  Each sample can carry two manifests. <code>extension.json</code> owns the builder entry point,
+  <code>package.json</code> owns npm metadata and dependencies. Deps merge from both files, and a
+  conflicting entry warns and keeps the <code>extension.json</code> value.
+</p>
+<p>
+  Copy a sample folder into your project, add its path to
+  <code>extensions</code>, and it runs on matching files. Factory extensions receive helpers from bb
+  itself, so they work with no installed dep. That covers global-only installs too.
+</p>
+<pre><code>export default function myExtension({ settings }) {
+  return {
+    name: "my-extension",
+    match: (file) => file.rel.endsWith(".png"),
+    transform: (content) => doWork(content, settings),
+  };
+}</code></pre>
+<h2>Json cleaner settings</h2>
+<pre><code>{
+  "bb": {
+    "extensions": [
+      {
+        "name": "json-cleaner",
+        "settings": { "stripSchemas": true, "minify": true }
+      }
+    ]
+  }
+}</code></pre>
+<p>
+  Both settings default to false. The extension runs on every JSON file and leaves unchanged files
+  alone.
+</p>
+<h2>Per-extension settings</h2>
+<p>
+  Use an object when an extension needs settings. String entries still work and use an empty
+  settings object.
+</p>
+<pre><code>{
+  "bb": {
+    "extensions": [
+      {
+        "name": "emissive-fixer",
+        "settings": { "stripPackIcons": false }
+      }
+    ]
+  }
+}</code></pre>
+<h2>Default processors</h2>
+<ul>
+  <li><code>normalize-text</code> unifies line endings and encoding for text files.</li>
+  <li><code>validate-json</code> parses JSON and warns on invalid files.</li>
+  <li><code>raw-copy</code> is the fallback that copies anything unmatched.</li>
+</ul>
+<p>
+  Core texture and audio helpers stay exported for extension authors. Nothing loads them unless an
+  extension calls them.
+</p>

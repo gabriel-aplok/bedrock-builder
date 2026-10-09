@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Verify with bb check - Bedrock Builder docs</title>
+    <meta name="description" content="Inspect the project and fix what is missing with bb check --fix." />
+    <meta name="theme-color" content="#000000" />
+    <link rel="canonical" href="https://bedrock.trenbankai.dev/docs/guides/verify-check/" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../../../assets/icon-32.png" />
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png" />
+    <link rel="manifest" href="../../../assets/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bedrock Builder" />
+    <meta property="og:title" content="Verify with bb check - Bedrock Builder docs" />
+    <meta property="og:description" content="Inspect the project and fix what is missing with bb check --fix." />
+    <meta property="og:url" content="https://bedrock.trenbankai.dev/docs/guides/verify-check/" />
+    <meta property="og:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Verify with bb check - Bedrock Builder docs" />
+    <meta name="twitter:description" content="Inspect the project and fix what is missing with bb check --fix." />
+    <meta name="twitter:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <link rel="stylesheet" href="../../../styles.css" />
+  </head>
+  <body data-page="verify-check">
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="../../../">Bedrock Builder</a>
+        <nav>
+          <a href="../../../docs/">Docs</a>
+          <a href="../../../#workflow">Workflow</a>
+          <a href="../../../#generators">Generators</a>
+          <a href="../../../#start">Install</a>
+          <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+          <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        </nav>
+        <a class="cta" href="../../../#start">Get Started</a>
+      </div>
+    </header>
+
+    <div class="docs-wrap">
+      <aside class="sidebar">
+        <p class="group">docs</p>
+        <a href="../../" data-page="index">Introduction</a>
+        <a href="../../getting-started/" data-page="getting-started">Getting Started</a>
+        <p class="group">concepts</p>
+        <a href="../../concepts/workspace-layout/" data-page="workspace-layout"
+          >Workspace Layout</a
+        >
+        <a href="../../concepts/packs-and-manifests/" data-page="packs-and-manifests"
+          >Packs and Manifests</a
+        >
+        <a href="../../concepts/pipeline/" data-page="pipeline">Build Pipeline</a>
+        <a href="../../concepts/extensions/" data-page="extensions">Extensions</a>
+        <a href="../../concepts/comparison/" data-page="comparison">Tool Comparison</a>
+        <p class="group">guides</p>
+        <a href="../../guides/hot-reload/" data-page="hot-reload">Hot Reload Setup</a>
+        <a href="../../guides/ship/" data-page="ship">Shipping a .mcaddon</a>
+        <a href="../../guides/custom-deploy/" data-page="custom-deploy">Custom Deploy Path</a>
+        <a href="../../guides/verify-check/" data-page="verify-check">Verify with bb check</a>
+        <a href="../../guides/preview-diff/" data-page="preview-diff">Preview with bb diff</a>
+        <a href="../../guides/verify-harness/" data-page="verify-harness"
+          >Verify with bb harness</a
+        >
+        <a href="../../guides/release-publish/" data-page="release-publish"
+          >Release with bb publish</a
+        >
+        <a href="../../guides/troubleshooting/" data-page="troubleshooting">Troubleshooting</a>
+        <p class="group">reference</p>
+        <a href="../../reference/cli/" data-page="cli">CLI: bb</a>
+        <a href="../../reference/generators/" data-page="generators">CLI: bb new</a>
+        <a href="../../reference/config/" data-page="config">Config Schema</a>
+        <a href="../../reference/exit-codes/" data-page="exit-codes">Exit Codes</a>
+        <a href="../../reference/api/" data-page="api">API Reference</a>
+        <a href="../../changelog/" data-page="changelog">Changelog</a>
+      </aside>
+      <main class="doc">
+        <h1>Verify with bb check</h1>
+<p>
+  <code>bb check</code> inspects the project and lists what is missing. Run it after create, after
+  cloning, and before shipping.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb check
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">check</span> <span class="k">--fix</span>
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">check</span> <span class="k">--json</span></code></pre></div>
+<h2>What it checks</h2>
+<ul>
+  <li>Config loads: name plus version present, semver valid.</li>
+  <li>Both pack dirs exist on disk.</li>
+  <li>Both <code>manifest.json</code> files exist.</li>
+  <li>Entry file exists at <code>bb.entry</code>.</li>
+  <li>Deploy target resolves to a real <code>com.mojang</code> folder.</li>
+  <li>
+    Extension tools on PATH when enabled. Warns only, never fails. Audio copies through without it.
+  </li>
+</ul>
+<h2>Fix mode</h2>
+<p>
+  <code>--fix</code> loads the config leniently, so it runs on broken projects too. It creates
+  missing pack dirs, writes minimal manifests with fresh UUIDs, and creates the entry file. It
+  prints how many items it fixed. Rerun <code>bb check</code> after to confirm green.
+</p>
+<h2>CI use</h2>
+<p>
+  Exit code is 0 when every check passes, 1 on any failure. <code>--json</code> prints one report
+  object with a checks array. Parse stdout, never stderr.
+</p>
+ <nav class="pager"><a href="../custom-deploy/"><span>Previous</span>Custom Deploy Path</a><a href="../preview-diff/" style="text-align:right"><span>Next</span>Preview with bb diff</a></nav>
+        <p class="edit-link">
+          <a href="https://github.com/gabriel-aplok/bedrock-builder/tree/main/docs/content/verify-check.html"
+            >Edit this page</a
+          >
+        </p>
+      </main>
+    </div>
+
+    <footer>
+      <p>
+        <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+        <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        <a href="https://www.npmjs.com/package/@aplok/bedrock-builder">npm</a>
+      </p>
+      <p>Built for Minecraft Bedrock developers. zlib licensed.</p>
+    </footer>
+    <script>
+      document.querySelectorAll(".sidebar a[data-page]").forEach((a) => {
+        if (a.getAttribute("data-page") === document.body.dataset.page) a.classList.add("active");
+      });
+      document.querySelectorAll(".codeblock").forEach((block) => {
+        const btn = block.querySelector(".copy-btn");
+        const code = block.querySelector("code");
+        if (!btn || !code) return;
+        btn.addEventListener("click", async () => {
+          const clone = code.cloneNode(true);
+          clone.querySelectorAll("[data-copy-skip]").forEach((el) => el.remove());
+          const text = clone.innerText;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const holder = document.createElement("pre");
+            holder.textContent = text;
+            holder.style.position = "fixed";
+            holder.style.opacity = "0";
+            document.body.appendChild(holder);
+            const range = document.createRange();
+            range.selectNodeContents(holder);
+            const sel = getSelection();
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(range);
+              document.execCommand("copy");
+              sel.removeAllRanges();
+            }
+            holder.remove();
+          }
+          btn.classList.add("copied");
+          btn.setAttribute("aria-label", "Copied");
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.setAttribute("aria-label", "Copy code");
+          }, 1500);
+        });
+      });
+    </script>
+  </body>
+</html>

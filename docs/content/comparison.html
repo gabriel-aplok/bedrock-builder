@@ -1,0 +1,226 @@
+<h1>Bedrock Builder versus other tools</h1>
+<p>
+  Four tools cover most Bedrock work. Each fits one band. This page states the difference so the
+  choice stays simple.
+</p>
+<h2>The four bands</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Tool</th>
+      <th>Band</th>
+      <th>Use it for</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>mct (Microsoft)</td>
+      <td>Learn</td>
+      <td>
+        Learn the raw API the official way, follow Microsoft tutorials, validate with the official
+        rule suites.
+      </td>
+    </tr>
+    <tr>
+      <td>Bedrock Builder</td>
+      <td>Build and ship</td>
+      <td>Create once, generate linked files, hot reload, ship one file.</td>
+    </tr>
+    <tr>
+      <td>bridge. v2 (bridge-core)</td>
+      <td>Edit visually</td>
+      <td>
+        Edit packs in a desktop editor with tree plus text views, presets, auto completions, live
+        previews, com.mojang sync.
+      </td>
+    </tr>
+    <tr>
+      <td>Regolith (Bedrock-OSS)</td>
+      <td>Transform at scale</td>
+      <td>Filter pipelines over large multi-pack projects.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Feature comparison</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Bedrock Builder</th>
+      <th>mct</th>
+      <th>bridge. v2</th>
+      <th>Regolith</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Create</td>
+      <td><code>bb init</code> writes config, manifests with fresh UUIDs, entry, registries</td>
+      <td><code>mct create</code> prompts plus goal and level based templates</td>
+      <td>Project creation window: BP, RP, skin pack, world template, namespace, target version</td>
+      <td>Project templates plus profiles</td>
+    </tr>
+    <tr>
+      <td>Generators</td>
+      <td><code>bb new</code>, 27 types, every linked file in one shot, dry run, safe rerun</td>
+      <td><code>mct add entity</code> plus samples and snippets</td>
+      <td>
+        Presets for blocks, entities, items, plus single file creates, filtered by target version
+      </td>
+      <td>Filters generate at compile time</td>
+    </tr>
+    <tr>
+      <td>Script bundling</td>
+      <td>esbuild, dev plus release modes, external <code>@minecraft/server</code></td>
+      <td>Bundled in the toolchain</td>
+      <td>Dash compiler with built-in plus store plugins</td>
+      <td>Via filters such as bundlers</td>
+    </tr>
+    <tr>
+      <td>Hot reload</td>
+      <td><code>bb run --watch</code>, rebuild plus copy on save, 100ms batches</td>
+      <td>Server and deploy workflows, local web server</td>
+      <td>com.mojang syncing on linked folder</td>
+      <td>Watch plus export target</td>
+    </tr>
+    <tr>
+      <td>Deploy target</td>
+      <td>Retail auto detect on Windows, macOS, Linux, plus custom path</td>
+      <td>Official paths, multi device deploy</td>
+      <td>Linked com.mojang folder per install</td>
+      <td>Configured target per profile</td>
+    </tr>
+    <tr>
+      <td>Packaging</td>
+      <td><code>bb ship</code> writes one <code>.mcaddon</code>, level 0 to 9</td>
+      <td>Packaging into <code>.mcaddon</code> via CLI</td>
+      <td>Export project to <code>.mcaddon</code> or archive</td>
+      <td>Export config per profile</td>
+    </tr>
+    <tr>
+      <td>Validation</td>
+      <td><code>bb check</code> plus <code>bb harness</code> cross-check every dist reference</td>
+      <td>Built-in rule suites, CSV plus HTML reports, local only</td>
+      <td>
+        Schema validation, error detection, hand written auto completions, content error log
+        explorer
+      </td>
+      <td>Filter errors surface at compile time</td>
+    </tr>
+    <tr>
+      <td>Editing model</td>
+      <td>Terminal commands, files on disk</td>
+      <td>Web editor plus terminal</td>
+      <td>
+        Desktop editor: tree view for beginners, text view with syntax plus go to definition, model
+        and particle previews
+      </td>
+      <td>Terminal pipeline, edit in any editor</td>
+    </tr>
+    <tr>
+      <td>Output</td>
+      <td>Plain BP plus RP folders, no lock-in</td>
+      <td>Standard packs</td>
+      <td>Standard packs, project config standard shared with other tools</td>
+      <td>Plain packs out of the pipeline</td>
+    </tr>
+    <tr>
+      <td>Runtime</td>
+      <td>Node 20.19 or later only</td>
+      <td>Node 22 or later, plus browser for the web app</td>
+      <td>Desktop app plus web app, offline once installed</td>
+      <td>Go binary plus per-filter runtimes</td>
+    </tr>
+    <tr>
+      <td>Extensibility</td>
+      <td>
+        User enabled processors: <code>match</code> plus <code>remap</code>, <code>pre</code>,
+        <code>transform</code>, <code>post</code>. Broken extensions warn and skip. See
+        <a href="{{DOCS}}concepts/extensions/">Extensions</a>
+      </td>
+      <td>Plugins plus MCP server tools</td>
+      <td>Extension store: presets, themes, compiler plugins for Dash</td>
+      <td>Filters in any language, unified compile flow, shared standard library</td>
+    </tr>
+    <tr>
+      <td>License</td>
+      <td>zlib</td>
+      <td>Microsoft open source terms</td>
+      <td>GPL-3.0</td>
+      <td>zlib</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Pick Bedrock Builder when</h2>
+<ul>
+  <li>Starting a new add-on that must ship, not just teach the API.</li>
+  <li>Hand-wiring items, attachables, textures, and lang lines costs too much time.</li>
+  <li>Hot reload plus one-command packaging must work out of the box.</li>
+  <li>No pipeline config is wanted until the project outgrows one binary.</li>
+</ul>
+<h2>Pick something else when</h2>
+<ul>
+  <li>Learning the raw <code>@minecraft/server</code> API matters most. Use mct.</li>
+  <li>Visual pack editing with previews matters most. Use bridge. v2.</li>
+  <li>Compile-time transforms over many packs matter most. Use Regolith.</li>
+</ul>
+<p>
+  Bedrock Builder emits plain standard packs, so a project can move to Regolith or bridge. later
+  with no rewrite. Generation here creates standard files in one command. Generation in Regolith is
+  a compile-time transform. bridge. reads the same folders through its project config standard.
+</p>
+<h2>Sources</h2>
+<ul>
+  <li>
+    <a href="https://learn.microsoft.com/en-us/minecraft/creator/documents/mctoolsoverview"
+      >mct overview</a
+    >: templates by level, CLI commands, validation suites, Node 22 need.
+  </li>
+  <li>
+    <a href="https://bridge-core.app/guide/">bridge. v2 guide</a>: project creation fields, presets,
+    Dash compiler, com.mojang syncing.
+  </li>
+  <li>
+    <a href="https://bridge-core.app/guide/features/">bridge. v2 features</a>: previews, auto
+    completions, export, extension store.
+  </li>
+  <li>
+    <a href="https://regolith-docs.readthedocs.io/en/latest/">Regolith docs</a>: unified compile
+    flow, filters, source of truth outside com.mojang.
+  </li>
+</ul>
+<h2>Quick decision</h2>
+<table>
+  <thead>
+    <tr>
+      <th>You want</th>
+      <th>Use</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Learn the official API</td>
+      <td>mct</td>
+    </tr>
+    <tr>
+      <td>Edit packs in a visual editor</td>
+      <td>bridge. v2</td>
+    </tr>
+    <tr>
+      <td>Shortest path to a shipped add-on</td>
+      <td>Bedrock Builder</td>
+    </tr>
+    <tr>
+      <td>Generators that write every linked file</td>
+      <td>Bedrock Builder</td>
+    </tr>
+    <tr>
+      <td>Hot reload plus <code>.mcaddon</code> out of the box</td>
+      <td>Bedrock Builder</td>
+    </tr>
+    <tr>
+      <td>Filter pipeline for a large project</td>
+      <td>Regolith</td>
+    </tr>
+  </tbody>
+</table>

@@ -1,0 +1,30 @@
+<h1>Release with bb publish</h1>
+<p>
+  <code>bb publish</code> runs the full release flow in one command: optional version bump, ship,
+  harness, git tag, git push.
+</p>
+<pre><code>bb publish --dry-run
+bb publish --bump minor --tag --push</code></pre>
+<h2>Step order</h2>
+<ul>
+  <li>
+    Bump first when <code>--bump</code> is set. Accepts <code>patch</code>, <code>minor</code>,
+    <code>major</code>, or <code>x.y.z</code>. Writes to config plus both manifests.
+  </li>
+  <li>Ship a release build into <code>dist/&lt;name&gt;-&lt;version&gt;.mcaddon</code>.</li>
+  <li>Harness the output. Any finding stops the release with exit code 12.</li>
+  <li>
+    Tag <code>v&lt;version&gt;</code> when <code>--tag</code> is set. Fails when git tag fails.
+  </li>
+  <li>Push plus push tags when <code>--push</code> is set. Fails when either push fails.</li>
+</ul>
+<h2>Preview first</h2>
+<p>
+  <code>--dry-run</code> prints the plan and runs nothing: the ship target, the harness step, the
+  tag name, the push steps. Use it before every real publish.
+</p>
+<h2>Typecheck option</h2>
+<p>
+  <code>--typecheck</code> runs <code>tsc --noEmit</code> before shipping. Diagnostics print with
+  file, line, column, and code. Exit code is 6.
+</p>

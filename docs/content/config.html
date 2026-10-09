@@ -1,0 +1,111 @@
+<h1>Config Schema</h1>
+<p>
+  Every command except <code>init</code>, <code>version</code>, and <code>manifest</code> loads
+  <code>config.json</code>. Lookup order is <code>--config</code>, then <code>./config.json</code>,
+  then <code>./bedrock.config.json</code>. Unknown extra keys are ignored.
+</p>
+<pre><code>{
+  "type": "minecraftBedrock",
+  "name": "my-addon",
+  "targetVersion": "1.21.0",
+  "namespace": "my_addon",
+  "packs": { "behaviorPack": "packs/BP", "resourcePack": "packs/RP" },
+  "worlds": [],
+  "bb": {
+    "version": "1.0.0",
+    "entry": "src/main.ts",
+    "out": "dist",
+    "deploy": { "target": "retail", "customPath": null },
+    "extensions": []
+  },
+  "minecraft": { "serverVersion": "2.0.0" }
+}</code></pre>
+<h2>Top level keys</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>Project name. Non-empty string. Also the deploy folder name.</td>
+    </tr>
+    <tr>
+      <td><code>targetVersion</code></td>
+      <td>Minecraft target version. Maps to the server API version.</td>
+    </tr>
+    <tr>
+      <td><code>packs.behaviorPack</code></td>
+      <td>BP source dir. Default is packs/BP.</td>
+    </tr>
+    <tr>
+      <td><code>packs.resourcePack</code></td>
+      <td>RP source dir. Default is packs/RP.</td>
+    </tr>
+    <tr>
+      <td><code>namespace</code></td>
+      <td>
+        Identifier prefix per the standard Bedrock format. bb.namespace stays as fallback. Derived
+        from name when both are omitted.
+      </td>
+    </tr>
+    <tr>
+      <td><code>worlds</code></td>
+      <td>
+        Glob list of world folders per the standard. Default is empty. Read but not written by bb.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h2>bb keys</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>bb.namespace</code></td>
+      <td>Legacy identifier prefix. Top-level namespace wins when both exist.</td>
+    </tr>
+    <tr>
+      <td><code>bb.version</code></td>
+      <td>Project version. Falls back to package.json version. Must be semver.</td>
+    </tr>
+    <tr>
+      <td><code>bb.entry</code></td>
+      <td>Script entry. Defaults to src/main.ts, then src/main.js when the ts file is missing.</td>
+    </tr>
+    <tr>
+      <td><code>bb.out</code></td>
+      <td>Output dir. Default is dist.</td>
+    </tr>
+    <tr>
+      <td><code>bb.deploy.target</code></td>
+      <td>retail or custom. Default is retail.</td>
+    </tr>
+    <tr>
+      <td><code>bb.deploy.customPath</code></td>
+      <td>Data dir for custom target. Required when target is custom.</td>
+    </tr>
+    <tr>
+      <td><code>bb.extensions</code></td>
+      <td>Array of non-empty extension names or paths. Optional.</td>
+    </tr>
+    <tr>
+      <td><code>bb.extensions[].settings</code></td>
+      <td>Optional JSON object passed to that extension. String entries use an empty object.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Validation</h2>
+<p>
+  Version must be semver. Both pack dirs must exist with a
+  <code>manifest.json</code> each. The entry file must exist. Custom deploy needs a non-empty
+  <code>customPath</code>. Failures exit with code 2 and name the missing piece.
+</p>

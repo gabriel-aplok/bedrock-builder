@@ -1,0 +1,240 @@
+<h1>API Reference</h1>
+<p>
+  Import from <code>@aplok/bedrock-builder</code> to run builds, generators, and checks from Node.
+  Every command function accepts a loaded config plus an options object, and returns a report.
+</p>
+<pre><code>import { loadConfig, build, harness } from "@aplok/bedrock-builder";
+
+const config = await loadConfig("./config.json");
+await build(config, { release: false });
+await harness(config, { strict: true });</code></pre>
+<h2>Config</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Export</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>loadConfig(path?)</code></td>
+      <td>Load plus validate. Throws ConfigError with exitCode 2 on failure.</td>
+    </tr>
+    <tr>
+      <td><code>loadConfigLenient(path?)</code></td>
+      <td>Load without disk validation, for repair flows.</td>
+    </tr>
+    <tr>
+      <td><code>validateConfig(config, fs)</code></td>
+      <td>Check packs, manifests, entry, deploy target.</td>
+    </tr>
+    <tr>
+      <td><code>BedrockConfig</code></td>
+      <td>Resolved config type. Paths are absolute.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Build and ship</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Export</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>build(config, { release, clean, typecheck, stats, json })</code></td>
+      <td>Bundle plus copy packs. Returns BuildReport with timings and counts.</td>
+    </tr>
+    <tr>
+      <td><code>pack(config, { output, level, typecheck, json })</code></td>
+      <td>Release build plus <code>.mcaddon</code> zip. Throws PackError with exitCode 4.</td>
+    </tr>
+    <tr>
+      <td><code>clean(config, { json })</code></td>
+      <td>Remove dist plus cache.</td>
+    </tr>
+    <tr>
+      <td><code>collectBuildStats(out, bundle)</code></td>
+      <td>Size plus biggest files for <code>--stats</code>.</td>
+    </tr>
+    <tr>
+      <td><code>buildBundle(config, { release })</code></td>
+      <td>esbuild the entry only. Throws BundlerError with exitCode 7.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Watch and deploy</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Export</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>watch(config, { types, stop })</code></td>
+      <td>Rebuild on save until stopped.</td>
+    </tr>
+    <tr>
+      <td><code>startWatch(config, options)</code></td>
+      <td>Returns a session with <code>stop()</code> plus <code>done</code>.</td>
+    </tr>
+    <tr>
+      <td><code>deploy(config, { release, watch, types, stop })</code></td>
+      <td>Build plus copy into the game. Throws DeployTargetError with exitCode 3.</td>
+    </tr>
+    <tr>
+      <td><code>startDeployWatch(config, options)</code></td>
+      <td>Deploy watch session with <code>stop()</code>.</td>
+    </tr>
+    <tr>
+      <td><code>resolveDeployTarget(config)</code></td>
+      <td>Resolve BP, RP, and root paths for the target.</td>
+    </tr>
+    <tr>
+      <td><code>createPackWatcher(config)</code></td>
+      <td>Chokidar watcher with temp, git, node_modules, and gitignore skips.</td>
+    </tr>
+    <tr>
+      <td><code>SaveBatcher</code></td>
+      <td>100ms save batcher shared by watch and deploy.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Verify</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Export</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>doctor(config, { fix, json })</code></td>
+      <td>Check config, packs, entry, deploy target, plus extension health checks.</td>
+    </tr>
+    <tr>
+      <td><code>harness(config, { build, strict, json })</code></td>
+      <td>Build plus cross-check dist. Throws HarnessError with exitCode 11.</td>
+    </tr>
+    <tr>
+      <td><code>harnessCheck(out, { strict })</code></td>
+      <td>Check a dist dir directly, no config needed.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Generate</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Export</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>create(config, opts)</code></td>
+      <td>Run one generator. Throws GenerateError with exitCode 5 on conflict.</td>
+    </tr>
+    <tr>
+      <td><code>CREATE_TYPES</code></td>
+      <td>All 27 generator type names.</td>
+    </tr>
+    <tr>
+      <td><code>planWeapon</code> plus 26 more</td>
+      <td>Per-type planners taking a Tree, config, and options.</td>
+    </tr>
+    <tr>
+      <td><code>Tree</code>, <code>planTree</code>, <code>hasConflict</code></td>
+      <td>Plan, check, and flush file writes.</td>
+    </tr>
+    <tr>
+      <td><code>mergeLang</code>, <code>mergeItemTexture</code> plus 6 more</td>
+      <td>Registry merge helpers.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>validateName</code>, <code>validateIdentifier</code>, <code>deriveNamespace</code>
+      </td>
+      <td>Naming helpers.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Extensions</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Export</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>defineProcessor(stage)</code></td>
+      <td>Validate a processor with match plus remap, pre, transform, post hooks.</td>
+    </tr>
+    <tr>
+      <td><code>registerProcessor(stage)</code></td>
+      <td>Add or replace by name.</td>
+    </tr>
+    <tr>
+      <td><code>loadExtensions(config)</code></td>
+      <td>Load from the extensions array.</td>
+    </tr>
+    <tr>
+      <td><code>inspectExtensions(config)</code></td>
+      <td>Status per spec: ok, missing, or broken.</td>
+    </tr>
+    <tr>
+      <td><code>ExtensionApi</code></td>
+      <td>
+        Generic extension API: register and settings. Media codecs belong to the extensions that use
+        them.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  The core package does not export audio, PNG, or TGA processors. Install and configure the
+  extension that owns the media format instead.
+</p>
+<h2>Project setup</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Export</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>init(name, options)</code></td>
+      <td>Create a project. Throws InitError with exitCode 8.</td>
+    </tr>
+    <tr>
+      <td><code>buildInitFiles(input)</code></td>
+      <td>File list for a create, no disk writes.</td>
+    </tr>
+    <tr>
+      <td><code>version(v, options)</code></td>
+      <td>Write one version everywhere.</td>
+    </tr>
+    <tr>
+      <td><code>manifest(options)</code></td>
+      <td>Rewrite UUIDs plus cross-link packs.</td>
+    </tr>
+    <tr>
+      <td><code>rewriteManifests(root, options)</code></td>
+      <td>Lower level manifest rewrite.</td>
+    </tr>
+    <tr>
+      <td><code>folders(config)</code>, <code>listFolderOptions(config)</code></td>
+      <td>Canonical folder picker plus listing.</td>
+    </tr>
+  </tbody>
+</table>

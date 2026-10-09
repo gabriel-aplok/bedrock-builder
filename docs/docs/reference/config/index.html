@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Config Schema - Bedrock Builder docs</title>
+    <meta name="description" content="Every config.json key bb reads." />
+    <meta name="theme-color" content="#000000" />
+    <link rel="canonical" href="https://bedrock.trenbankai.dev/docs/reference/config/" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../../../assets/icon-32.png" />
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png" />
+    <link rel="manifest" href="../../../assets/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bedrock Builder" />
+    <meta property="og:title" content="Config Schema - Bedrock Builder docs" />
+    <meta property="og:description" content="Every config.json key bb reads." />
+    <meta property="og:url" content="https://bedrock.trenbankai.dev/docs/reference/config/" />
+    <meta property="og:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Config Schema - Bedrock Builder docs" />
+    <meta name="twitter:description" content="Every config.json key bb reads." />
+    <meta name="twitter:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <link rel="stylesheet" href="../../../styles.css" />
+  </head>
+  <body data-page="config">
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="../../../">Bedrock Builder</a>
+        <nav>
+          <a href="../../../docs/">Docs</a>
+          <a href="../../../#workflow">Workflow</a>
+          <a href="../../../#generators">Generators</a>
+          <a href="../../../#start">Install</a>
+          <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+          <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        </nav>
+        <a class="cta" href="../../../#start">Get Started</a>
+      </div>
+    </header>
+
+    <div class="docs-wrap">
+      <aside class="sidebar">
+        <p class="group">docs</p>
+        <a href="../../" data-page="index">Introduction</a>
+        <a href="../../getting-started/" data-page="getting-started">Getting Started</a>
+        <p class="group">concepts</p>
+        <a href="../../concepts/workspace-layout/" data-page="workspace-layout"
+          >Workspace Layout</a
+        >
+        <a href="../../concepts/packs-and-manifests/" data-page="packs-and-manifests"
+          >Packs and Manifests</a
+        >
+        <a href="../../concepts/pipeline/" data-page="pipeline">Build Pipeline</a>
+        <a href="../../concepts/extensions/" data-page="extensions">Extensions</a>
+        <a href="../../concepts/comparison/" data-page="comparison">Tool Comparison</a>
+        <p class="group">guides</p>
+        <a href="../../guides/hot-reload/" data-page="hot-reload">Hot Reload Setup</a>
+        <a href="../../guides/ship/" data-page="ship">Shipping a .mcaddon</a>
+        <a href="../../guides/custom-deploy/" data-page="custom-deploy">Custom Deploy Path</a>
+        <a href="../../guides/verify-check/" data-page="verify-check">Verify with bb check</a>
+        <a href="../../guides/preview-diff/" data-page="preview-diff">Preview with bb diff</a>
+        <a href="../../guides/verify-harness/" data-page="verify-harness"
+          >Verify with bb harness</a
+        >
+        <a href="../../guides/release-publish/" data-page="release-publish"
+          >Release with bb publish</a
+        >
+        <a href="../../guides/troubleshooting/" data-page="troubleshooting">Troubleshooting</a>
+        <p class="group">reference</p>
+        <a href="../../reference/cli/" data-page="cli">CLI: bb</a>
+        <a href="../../reference/generators/" data-page="generators">CLI: bb new</a>
+        <a href="../../reference/config/" data-page="config">Config Schema</a>
+        <a href="../../reference/exit-codes/" data-page="exit-codes">Exit Codes</a>
+        <a href="../../reference/api/" data-page="api">API Reference</a>
+        <a href="../../changelog/" data-page="changelog">Changelog</a>
+      </aside>
+      <main class="doc">
+        <h1>Config Schema</h1>
+<p>
+  Every command except <code>init</code>, <code>version</code>, and <code>manifest</code> loads
+  <code>config.json</code>. Lookup order is <code>--config</code>, then <code>./config.json</code>,
+  then <code>./bedrock.config.json</code>. Unknown extra keys are ignored.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>{
+  "type": "minecraftBedrock",
+  "name": "my-addon",
+  "targetVersion": "1.21.0",
+  "namespace": "my_addon",
+  "packs": { "behaviorPack": "packs/BP", "resourcePack": "packs/RP" },
+  "worlds": [],
+  "bb": {
+    "version": "1.0.0",
+    "entry": "src/main.ts",
+    "out": "dist",
+    "deploy": { "target": "retail", "customPath": null },
+    "extensions": []
+  },
+  "minecraft": { "serverVersion": "2.0.0" }
+}</code></pre></div>
+<h2>Top level keys</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>Project name. Non-empty string. Also the deploy folder name.</td>
+    </tr>
+    <tr>
+      <td><code>targetVersion</code></td>
+      <td>Minecraft target version. Maps to the server API version.</td>
+    </tr>
+    <tr>
+      <td><code>packs.behaviorPack</code></td>
+      <td>BP source dir. Default is packs/BP.</td>
+    </tr>
+    <tr>
+      <td><code>packs.resourcePack</code></td>
+      <td>RP source dir. Default is packs/RP.</td>
+    </tr>
+    <tr>
+      <td><code>namespace</code></td>
+      <td>
+        Identifier prefix per the standard Bedrock format. bb.namespace stays as fallback. Derived
+        from name when both are omitted.
+      </td>
+    </tr>
+    <tr>
+      <td><code>worlds</code></td>
+      <td>
+        Glob list of world folders per the standard. Default is empty. Read but not written by bb.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h2>bb keys</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>bb.namespace</code></td>
+      <td>Legacy identifier prefix. Top-level namespace wins when both exist.</td>
+    </tr>
+    <tr>
+      <td><code>bb.version</code></td>
+      <td>Project version. Falls back to package.json version. Must be semver.</td>
+    </tr>
+    <tr>
+      <td><code>bb.entry</code></td>
+      <td>Script entry. Defaults to src/main.ts, then src/main.js when the ts file is missing.</td>
+    </tr>
+    <tr>
+      <td><code>bb.out</code></td>
+      <td>Output dir. Default is dist.</td>
+    </tr>
+    <tr>
+      <td><code>bb.deploy.target</code></td>
+      <td>retail or custom. Default is retail.</td>
+    </tr>
+    <tr>
+      <td><code>bb.deploy.customPath</code></td>
+      <td>Data dir for custom target. Required when target is custom.</td>
+    </tr>
+    <tr>
+      <td><code>bb.extensions</code></td>
+      <td>Array of non-empty extension names or paths. Optional.</td>
+    </tr>
+    <tr>
+      <td><code>bb.extensions[].settings</code></td>
+      <td>Optional JSON object passed to that extension. String entries use an empty object.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Validation</h2>
+<p>
+  Version must be semver. Both pack dirs must exist with a
+  <code>manifest.json</code> each. The entry file must exist. Custom deploy needs a non-empty
+  <code>customPath</code>. Failures exit with code 2 and name the missing piece.
+</p>
+ <nav class="pager"><a href="../generators/"><span>Previous</span>CLI: bb new</a><a href="../exit-codes/" style="text-align:right"><span>Next</span>Exit Codes</a></nav>
+        <p class="edit-link">
+          <a href="https://github.com/gabriel-aplok/bedrock-builder/tree/main/docs/content/config.html"
+            >Edit this page</a
+          >
+        </p>
+      </main>
+    </div>
+
+    <footer>
+      <p>
+        <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+        <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        <a href="https://www.npmjs.com/package/@aplok/bedrock-builder">npm</a>
+      </p>
+      <p>Built for Minecraft Bedrock developers. zlib licensed.</p>
+    </footer>
+    <script>
+      document.querySelectorAll(".sidebar a[data-page]").forEach((a) => {
+        if (a.getAttribute("data-page") === document.body.dataset.page) a.classList.add("active");
+      });
+      document.querySelectorAll(".codeblock").forEach((block) => {
+        const btn = block.querySelector(".copy-btn");
+        const code = block.querySelector("code");
+        if (!btn || !code) return;
+        btn.addEventListener("click", async () => {
+          const clone = code.cloneNode(true);
+          clone.querySelectorAll("[data-copy-skip]").forEach((el) => el.remove());
+          const text = clone.innerText;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const holder = document.createElement("pre");
+            holder.textContent = text;
+            holder.style.position = "fixed";
+            holder.style.opacity = "0";
+            document.body.appendChild(holder);
+            const range = document.createRange();
+            range.selectNodeContents(holder);
+            const sel = getSelection();
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(range);
+              document.execCommand("copy");
+              sel.removeAllRanges();
+            }
+            holder.remove();
+          }
+          btn.classList.add("copied");
+          btn.setAttribute("aria-label", "Copied");
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.setAttribute("aria-label", "Copy code");
+          }, 1500);
+        });
+      });
+    </script>
+  </body>
+</html>

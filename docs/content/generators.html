@@ -1,0 +1,256 @@
+<h1>CLI: bb new</h1>
+<p>
+  <code>bb new &lt;type&gt; [name]</code> creates one feature: behavior JSON, resource JSON, plus
+  the texture and lang entries. It writes every linked file or nothing on conflict.
+</p>
+<pre><code>bb new weapon fire_sword --mode 3d --icon sword
+bb new block glow_block --light 12
+bb new recipe steel_ingot --recipe-kind furnace --result steel_ingot</code></pre>
+<h2>Types</h2>
+<p>
+  weapon, tool, armor, item, entity, block, recipe, loot, spawn, trade, dialogue, animation,
+  equipment, feature, feature_rule, particle, fog, function, voxel_shape, biome, camera,
+  item_catalog, sound, biomes_client, block_culling, dimension, ui.
+</p>
+<h2>Common flags</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Flag</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>--name &lt;name&gt;</code></td>
+      <td>Override for the positional name.</td>
+    </tr>
+    <tr>
+      <td><code>--icon &lt;name&gt;</code></td>
+      <td>Icon name and texture key.</td>
+    </tr>
+    <tr>
+      <td><code>--display-name &lt;s&gt;</code></td>
+      <td>Display name override.</td>
+    </tr>
+    <tr>
+      <td><code>--mode &lt;2d|3d|icon&gt;</code></td>
+      <td>Render mode. Weapon and entity take 2d or 3d. Armor takes icon or 3d.</td>
+    </tr>
+    <tr>
+      <td><code>--geometry &lt;id&gt;</code></td>
+      <td>3D geometry id from an imported model.</td>
+    </tr>
+    <tr>
+      <td><code>--texture &lt;path&gt;</code></td>
+      <td>3D texture path or block texture key.</td>
+    </tr>
+    <tr>
+      <td><code>--force</code></td>
+      <td>Overwrite conflicting files.</td>
+    </tr>
+    <tr>
+      <td><code>--dry-run</code></td>
+      <td>Print the plan, write nothing.</td>
+    </tr>
+    <tr>
+      <td><code>-y, --yes</code></td>
+      <td>Accept defaults, non-interactive.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Items and blocks</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Flag</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>--variant &lt;type&gt;</code></td>
+      <td>Tool: pickaxe, axe, shovel, hoe.</td>
+    </tr>
+    <tr>
+      <td><code>--piece &lt;type&gt;</code></td>
+      <td>Armor: helmet, chestplate, leggings, boots.</td>
+    </tr>
+    <tr>
+      <td><code>--tier &lt;tier&gt;</code></td>
+      <td>Tool tier. Default is diamond.</td>
+    </tr>
+    <tr>
+      <td><code>--durability &lt;n&gt;</code></td>
+      <td>Item durability.</td>
+    </tr>
+    <tr>
+      <td><code>--damage &lt;n&gt;</code></td>
+      <td>Weapon and tool damage.</td>
+    </tr>
+    <tr>
+      <td><code>--protection &lt;n&gt;</code></td>
+      <td>Armor protection.</td>
+    </tr>
+    <tr>
+      <td><code>--enchant-value &lt;n&gt;</code></td>
+      <td>Enchantability value.</td>
+    </tr>
+    <tr>
+      <td><code>--repair-item &lt;id&gt;</code></td>
+      <td>Repair item identifier.</td>
+    </tr>
+    <tr>
+      <td><code>--sound &lt;sound&gt;</code></td>
+      <td>Block sound. Default is stone.</td>
+    </tr>
+    <tr>
+      <td><code>--render-method &lt;m&gt;</code></td>
+      <td>Block render method: opaque, blend, alpha_test.</td>
+    </tr>
+    <tr>
+      <td><code>--light &lt;0-15&gt;</code></td>
+      <td>Block light emission.</td>
+    </tr>
+    <tr>
+      <td><code>--recipe &lt;kind&gt;</code></td>
+      <td>Also write a recipe: shapeless or furnace.</td>
+    </tr>
+    <tr>
+      <td><code>--loot &lt;kind&gt;</code></td>
+      <td>Also write a loot table: entity, block, or chest.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Recipes and loot</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Flag</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>--recipe-kind &lt;k&gt;</code></td>
+      <td>Recipe: shapeless, shaped, furnace.</td>
+    </tr>
+    <tr>
+      <td><code>--pattern &lt;rows&gt;</code></td>
+      <td>Shaped rows, semicolon separated.</td>
+    </tr>
+    <tr>
+      <td><code>--key &lt;map&gt;</code></td>
+      <td>Shaped symbols, X=id comma separated.</td>
+    </tr>
+    <tr>
+      <td><code>--result &lt;id&gt;</code></td>
+      <td>Recipe output or loot drop id.</td>
+    </tr>
+    <tr>
+      <td><code>--ingredients &lt;ids&gt;</code></td>
+      <td>Recipe inputs, comma separated.</td>
+    </tr>
+    <tr>
+      <td><code>--count &lt;n&gt;</code></td>
+      <td>Recipe output count.</td>
+    </tr>
+    <tr>
+      <td><code>--loot-kind &lt;k&gt;</code></td>
+      <td>Loot: entity, block, chest.</td>
+    </tr>
+    <tr>
+      <td><code>--rolls &lt;n&gt;</code></td>
+      <td>Loot pool rolls.</td>
+    </tr>
+    <tr>
+      <td><code>--min &lt;n&gt;</code></td>
+      <td>Loot drop min count.</td>
+    </tr>
+    <tr>
+      <td><code>--max &lt;n&gt;</code></td>
+      <td>Loot drop max count.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Entities and world</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Flag</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>--spawn-category &lt;k&gt;</code></td>
+      <td>Spawn: animal, monster, ambient, water.</td>
+    </tr>
+    <tr>
+      <td><code>--weight &lt;n&gt;</code></td>
+      <td>Spawn weight.</td>
+    </tr>
+    <tr>
+      <td><code>--equipment &lt;kind&gt;</code></td>
+      <td>Also write an equipment table for the entity.</td>
+    </tr>
+    <tr>
+      <td><code>--animation &lt;id&gt;</code></td>
+      <td>Animation to play.</td>
+    </tr>
+    <tr>
+      <td><code>--want &lt;id&gt;</code></td>
+      <td>Trade want id.</td>
+    </tr>
+    <tr>
+      <td><code>--give &lt;id&gt;</code></td>
+      <td>Trade give id.</td>
+    </tr>
+    <tr>
+      <td><code>--dialogue-text &lt;s&gt;</code></td>
+      <td>NPC line.</td>
+    </tr>
+    <tr>
+      <td><code>--dialogue-button &lt;s&gt;</code></td>
+      <td>NPC button.</td>
+    </tr>
+    <tr>
+      <td><code>--color &lt;hex&gt;</code></td>
+      <td>Fog or biome water color.</td>
+    </tr>
+    <tr>
+      <td><code>--fog &lt;id&gt;</code></td>
+      <td>Biome fog identifier.</td>
+    </tr>
+    <tr>
+      <td><code>--category &lt;c&gt;</code></td>
+      <td>Item catalog category.</td>
+    </tr>
+    <tr>
+      <td><code>--group &lt;id&gt;</code></td>
+      <td>Item catalog group.</td>
+    </tr>
+    <tr>
+      <td><code>--command &lt;text&gt;</code></td>
+      <td>Function command line.</td>
+    </tr>
+    <tr>
+      <td><code>--sound-file &lt;path&gt;</code></td>
+      <td>Sound file path.</td>
+    </tr>
+    <tr>
+      <td><code>--direction &lt;dir&gt;</code></td>
+      <td>Culling direction.</td>
+    </tr>
+    <tr>
+      <td><code>--x &lt;n&gt;, --y &lt;n&gt;, --z &lt;n&gt;</code></td>
+      <td>Camera position.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Safety</h2>
+<p>
+  Generators plan every file before writing. Existing files with different content are conflicts.
+  The generator stops and writes nothing unless
+  <code>--force</code> is set. <code>--dry-run</code> prints the create, update, and skip list.
+</p>

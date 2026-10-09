@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Packs and Manifests - Bedrock Builder docs</title>
+    <meta name="description" content="BP plus RP, UUIDs, versions, and the bb manifest and version commands." />
+    <meta name="theme-color" content="#000000" />
+    <link rel="canonical" href="https://bedrock.trenbankai.dev/docs/concepts/packs-and-manifests/" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../../../assets/icon-32.png" />
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png" />
+    <link rel="manifest" href="../../../assets/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bedrock Builder" />
+    <meta property="og:title" content="Packs and Manifests - Bedrock Builder docs" />
+    <meta property="og:description" content="BP plus RP, UUIDs, versions, and the bb manifest and version commands." />
+    <meta property="og:url" content="https://bedrock.trenbankai.dev/docs/concepts/packs-and-manifests/" />
+    <meta property="og:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Packs and Manifests - Bedrock Builder docs" />
+    <meta name="twitter:description" content="BP plus RP, UUIDs, versions, and the bb manifest and version commands." />
+    <meta name="twitter:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <link rel="stylesheet" href="../../../styles.css" />
+  </head>
+  <body data-page="packs-and-manifests">
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="../../../">Bedrock Builder</a>
+        <nav>
+          <a href="../../../docs/">Docs</a>
+          <a href="../../../#workflow">Workflow</a>
+          <a href="../../../#generators">Generators</a>
+          <a href="../../../#start">Install</a>
+          <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+          <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        </nav>
+        <a class="cta" href="../../../#start">Get Started</a>
+      </div>
+    </header>
+
+    <div class="docs-wrap">
+      <aside class="sidebar">
+        <p class="group">docs</p>
+        <a href="../../" data-page="index">Introduction</a>
+        <a href="../../getting-started/" data-page="getting-started">Getting Started</a>
+        <p class="group">concepts</p>
+        <a href="../../concepts/workspace-layout/" data-page="workspace-layout"
+          >Workspace Layout</a
+        >
+        <a href="../../concepts/packs-and-manifests/" data-page="packs-and-manifests"
+          >Packs and Manifests</a
+        >
+        <a href="../../concepts/pipeline/" data-page="pipeline">Build Pipeline</a>
+        <a href="../../concepts/extensions/" data-page="extensions">Extensions</a>
+        <a href="../../concepts/comparison/" data-page="comparison">Tool Comparison</a>
+        <p class="group">guides</p>
+        <a href="../../guides/hot-reload/" data-page="hot-reload">Hot Reload Setup</a>
+        <a href="../../guides/ship/" data-page="ship">Shipping a .mcaddon</a>
+        <a href="../../guides/custom-deploy/" data-page="custom-deploy">Custom Deploy Path</a>
+        <a href="../../guides/verify-check/" data-page="verify-check">Verify with bb check</a>
+        <a href="../../guides/preview-diff/" data-page="preview-diff">Preview with bb diff</a>
+        <a href="../../guides/verify-harness/" data-page="verify-harness"
+          >Verify with bb harness</a
+        >
+        <a href="../../guides/release-publish/" data-page="release-publish"
+          >Release with bb publish</a
+        >
+        <a href="../../guides/troubleshooting/" data-page="troubleshooting">Troubleshooting</a>
+        <p class="group">reference</p>
+        <a href="../../reference/cli/" data-page="cli">CLI: bb</a>
+        <a href="../../reference/generators/" data-page="generators">CLI: bb new</a>
+        <a href="../../reference/config/" data-page="config">Config Schema</a>
+        <a href="../../reference/exit-codes/" data-page="exit-codes">Exit Codes</a>
+        <a href="../../reference/api/" data-page="api">API Reference</a>
+        <a href="../../changelog/" data-page="changelog">Changelog</a>
+      </aside>
+      <main class="doc">
+        <h1>Packs and Manifests</h1>
+<p>
+  Every add-on is two packs. The behavior pack (BP) holds logic and data. The resource pack (RP)
+  holds visuals and audio. Each pack has a
+  <code>manifest.json</code> that names it and links it.
+</p>
+<h2>What the manifests hold</h2>
+<ul>
+  <li>
+    <code>header.uuid</code> uniquely identifies the pack. The game uses it to tell packs apart.
+  </li>
+  <li><code>header.version</code> and module versions track the pack version.</li>
+  <li><code>min_engine_version</code> sets the lowest game version that loads the pack.</li>
+  <li>
+    BP declares a <code>data</code> module and a <code>script</code> module with the bundle entry
+    <code>scripts/main.js</code>.
+  </li>
+  <li>
+    RP declares a <code>resources</code> module and a dependency on the BP uuid, so the two packs
+    load as one add-on.
+  </li>
+  <li>BP depends on <code>@minecraft/server</code> for the script API.</li>
+</ul>
+<h2>Fresh UUIDs per project</h2>
+<p><code>bb init</code> generates fresh UUIDs for every create. Cloned projects never collide.</p>
+<h2>Rewrite with bb manifest</h2>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb manifest --dry-run
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">manifest</span> <span class="k">--name</span> my-addon <span class="k">--pack-version</span> 1.1.0</code></pre></div>
+<p>
+  <code>bb manifest</code> detects the layout, rewrites both manifests, and cross-links the RP
+  dependency to the BP uuid. <code>--dry-run</code> prints the plan and writes nothing.
+</p>
+<h2>Bump with bb version</h2>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb version 1.1.0</code></pre></div>
+<p>
+  <code>bb version</code> writes one version to the config plus both manifests, so the three never
+  drift apart.
+</p>
+<h2>Validate with bb check</h2>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb check
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">check</span> <span class="k">--fix</span></code></pre></div>
+<p>
+  <code>bb check</code> verifies the config, both manifests, the entry file, and the deploy target.
+  <code>--fix</code> creates what is missing. <code>bb ship</code> validates the manifests again
+  before zipping.
+</p>
+ <nav class="pager"><a href="../workspace-layout/"><span>Previous</span>Workspace Layout</a><a href="../pipeline/" style="text-align:right"><span>Next</span>Build Pipeline</a></nav>
+        <p class="edit-link">
+          <a href="https://github.com/gabriel-aplok/bedrock-builder/tree/main/docs/content/packs-and-manifests.html"
+            >Edit this page</a
+          >
+        </p>
+      </main>
+    </div>
+
+    <footer>
+      <p>
+        <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+        <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        <a href="https://www.npmjs.com/package/@aplok/bedrock-builder">npm</a>
+      </p>
+      <p>Built for Minecraft Bedrock developers. zlib licensed.</p>
+    </footer>
+    <script>
+      document.querySelectorAll(".sidebar a[data-page]").forEach((a) => {
+        if (a.getAttribute("data-page") === document.body.dataset.page) a.classList.add("active");
+      });
+      document.querySelectorAll(".codeblock").forEach((block) => {
+        const btn = block.querySelector(".copy-btn");
+        const code = block.querySelector("code");
+        if (!btn || !code) return;
+        btn.addEventListener("click", async () => {
+          const clone = code.cloneNode(true);
+          clone.querySelectorAll("[data-copy-skip]").forEach((el) => el.remove());
+          const text = clone.innerText;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const holder = document.createElement("pre");
+            holder.textContent = text;
+            holder.style.position = "fixed";
+            holder.style.opacity = "0";
+            document.body.appendChild(holder);
+            const range = document.createRange();
+            range.selectNodeContents(holder);
+            const sel = getSelection();
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(range);
+              document.execCommand("copy");
+              sel.removeAllRanges();
+            }
+            holder.remove();
+          }
+          btn.classList.add("copied");
+          btn.setAttribute("aria-label", "Copied");
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.setAttribute("aria-label", "Copy code");
+          }, 1500);
+        });
+      });
+    </script>
+  </body>
+</html>

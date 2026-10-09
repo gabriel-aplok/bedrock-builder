@@ -1,0 +1,193 @@
+<h1>CLI: bb</h1>
+<p>
+  Full command reference for the <code>bb</code> binary. Run <code>bb --help</code> for the short
+  form.
+</p>
+<pre><code>bb &lt;command&gt; [options]</code></pre>
+<h2>Commands</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>init &lt;name&gt;</code></td>
+      <td>Create a fresh add-on project.</td>
+    </tr>
+    <tr>
+      <td><code>build</code></td>
+      <td>Bundle scripts and copy packs to dist/.</td>
+    </tr>
+    <tr>
+      <td><code>watch</code></td>
+      <td>Rebuild on save, no deploy.</td>
+    </tr>
+    <tr>
+      <td><code>run</code></td>
+      <td>Build, then copy into the game packs.</td>
+    </tr>
+    <tr>
+      <td><code>ship</code></td>
+      <td>Release build plus .mcaddon zip.</td>
+    </tr>
+    <tr>
+      <td><code>clean</code></td>
+      <td>Remove dist/ and the build cache.</td>
+    </tr>
+    <tr>
+      <td><code>diff</code></td>
+      <td>Show what changed since the last build.</td>
+    </tr>
+    <tr>
+      <td><code>folders</code></td>
+      <td>Pick canonical pack folders interactively.</td>
+    </tr>
+    <tr>
+      <td><code>ext</code></td>
+      <td>List resolved extension path and status.</td>
+    </tr>
+    <tr>
+      <td><code>check</code></td>
+      <td>Verify config, packs, entry, deploy target.</td>
+    </tr>
+    <tr>
+      <td><code>new &lt;type&gt; [name]</code></td>
+      <td>Create a feature. See bb new.</td>
+    </tr>
+    <tr>
+      <td><code>manifest</code></td>
+      <td>Rewrite pack manifest uuids and names.</td>
+    </tr>
+    <tr>
+      <td><code>version &lt;semver&gt;</code></td>
+      <td>Set the version in config plus manifests.</td>
+    </tr>
+    <tr>
+      <td><code>harness</code></td>
+      <td>Build then cross-check every dist reference.</td>
+    </tr>
+    <tr>
+      <td><code>publish</code></td>
+      <td>Ship, harness, optional bump, tag, push.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Global options</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Flag</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>-c, --config &lt;path&gt;</code></td>
+      <td>Config path. Default: ./config.json, then ./bedrock.config.json.</td>
+    </tr>
+    <tr>
+      <td><code>-v, --verbose</code></td>
+      <td>Verbose logging.</td>
+    </tr>
+    <tr>
+      <td><code>--json</code></td>
+      <td>One JSON object on stdout, for CI.</td>
+    </tr>
+    <tr>
+      <td><code>-h, --help</code></td>
+      <td>Show help.</td>
+    </tr>
+    <tr>
+      <td><code>--version</code></td>
+      <td>Show version.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>build</h2>
+<pre><code>bb build [--release] [--clean] [--typecheck] [--stats] [--json]</code></pre>
+<p>
+  Loads the config, bundles the entry with esbuild, and copies both packs into
+  <code>dist/</code>. <code>--release</code> minifies with no sourcemaps.
+  <code>--clean</code> removes <code>dist/</code> first. <code>--typecheck</code> runs
+  <code>tsc --noEmit</code> first. <code>--stats</code> prints bundle size plus biggest files.
+</p>
+<h2>watch</h2>
+<pre><code>bb watch [--no-types]</code></pre>
+<p>
+  Builds once, then rebuilds on save. No deploy. <code>--no-types</code> skips the parallel
+  <code>tsc --watch</code>.
+</p>
+<h2>run</h2>
+<pre><code>bb run [--watch] [--release] [--no-types]</code></pre>
+<p>
+  Builds, then copies <code>dist/packs/</code> into the game dev pack folders.
+  <code>--watch</code> keeps rebuilding on save. <code>--release</code> deploys minified output.
+</p>
+<h2>ship</h2>
+<pre><code>bb ship [--output &lt;path&gt;] [--level 0-9] [--typecheck] [--json]</code></pre>
+<p>
+  Runs a release build, validates manifests, and zips into
+  <code>.mcaddon</code>. Default output is <code>dist/&lt;name&gt;-&lt;version&gt;.mcaddon</code>.
+  Default compression is 6. Level 0 stores raw.
+</p>
+<h2>publish</h2>
+<pre><code>bb publish [--bump &lt;v&gt;] [--tag] [--push] [--dry-run] [--typecheck] [--json]</code></pre>
+<p>
+  Bumps the version first when <code>--bump</code> is set, then ships, harnesses, tags, and pushes.
+  Bump accepts <code>patch</code>, <code>minor</code>, <code>major</code>, or <code>x.y.z</code>.
+</p>
+<h2>clean</h2>
+<pre><code>bb clean [--json]</code></pre>
+<p>Removes <code>dist/</code> and the build cache. No flags besides <code>--json</code>.</p>
+<h2>diff</h2>
+<pre><code>bb diff [--json]</code></pre>
+<p>
+  Shows what changed since the last build from the existing cache: added, modified, and deleted
+  files. Reads only, never writes. No flags besides
+  <code>--json</code>.
+</p>
+<h2>folders</h2>
+<pre><code>bb folders</code></pre>
+<p>Interactive picker for canonical pack folders. No flags. Skips folders that already exist.</p>
+<h2>ext</h2>
+<pre><code>bb ext [--install] [--json]</code></pre>
+<p>
+  Lists each configured extension with its resolved path and ok, missing, or broken status.
+  <code>--install</code> installs per-extension node deps into each extension's own folder.
+</p>
+<h2>check</h2>
+<pre><code>bb check [--fix] [--json]</code></pre>
+<p>
+  Verifies config, packs, entry, and deploy target. <code>--fix</code> creates missing dirs,
+  manifests, and entry. Exits nonzero when anything fails.
+</p>
+<h2>manifest</h2>
+<pre><code>bb manifest [--name &lt;name&gt;] [--pack-version &lt;v&gt;] [--dir &lt;path&gt;] [--dry-run] [--json]</code></pre>
+<p>
+  Detects the layout, rewrites both manifests with consistent names and versions, and cross-links
+  the RP dependency to the BP uuid.
+</p>
+<h2>version</h2>
+<pre><code>bb version &lt;semver&gt; [--dry-run] [--json]</code></pre>
+<p>
+  Writes one version to the config plus both manifests.
+  <code>--dry-run</code> previews without writing.
+</p>
+<h2>harness</h2>
+<pre><code>bb harness [--no-build] [--strict] [--json]</code></pre>
+<p>
+  Builds, then cross-checks every icon, texture, recipe, and spawn reference in
+  <code>dist/</code>. <code>--no-build</code> checks the current <code>dist/</code> without
+  rebuilding. <code>--strict</code> also fails on missing pack icons and unused lang keys.
+</p>
+<h2>init</h2>
+<pre><code>bb init &lt;name&gt; [--dir &lt;path&gt;] [--here] [--target-version &lt;v&gt;] [--js] [--git] [--install] [--force] [--json]</code></pre>
+<p>
+  Creates a fresh project with config, manifests, entry file, and registries.
+  <code>--here</code> creates into the current directory. <code>--js</code> emits
+  <code>src/main.js</code> instead of TypeScript. <code>--force</code> overwrites a non-empty
+  directory.
+</p>

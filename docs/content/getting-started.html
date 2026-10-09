@@ -1,0 +1,76 @@
+<h1>Getting Started</h1>
+<p>
+  This walkthrough creates a fresh add-on, builds it, hot reloads it into Minecraft, and ships it as
+  a <code>.mcaddon</code>. It takes about five minutes.
+</p>
+<h2>Prerequisites</h2>
+<ul>
+  <li>Node.js 20.19 or later. Check with <code>node --version</code>.</li>
+  <li>
+    A Minecraft install if you want <code>bb run</code> to copy files into the game. See
+    <a href="{{DOCS}}guides/custom-deploy/">Custom Deploy Path</a> when auto detect misses.
+  </li>
+</ul>
+<h2>Create a new project</h2>
+<pre><code>npm install -g @aplok/bedrock-builder
+bb init my-addon
+cd my-addon
+npm install</code></pre>
+<p>
+  <code>bb init</code> writes the config, both manifests with fresh UUIDs, a working entry file, and
+  the texture registries. Answer the prompts, or pass <code>--here</code>, <code>--js</code>,
+  <code>--git</code>, and <code>--install</code> to skip them.
+</p>
+<h2>Look at what you got</h2>
+<pre><code>my-addon/
+  config.json
+  package.json
+  tsconfig.json
+  src/main.ts
+  packs/BP/
+  packs/RP/
+  dist/</code></pre>
+<p>
+  Full breakdown:
+  <a href="{{DOCS}}concepts/workspace-layout/">Workspace Layout</a>.
+</p>
+<h2>Generate your first feature</h2>
+<pre><code>bb new weapon fire_sword --mode 3d --icon sword</code></pre>
+<p>
+  The generator writes the item JSON, the attachable, the render controller, and the texture plus
+  lang entries. Generators accept prompts with defaults, or run fully flagged for scripts and CI.
+  Full list:
+  <a href="{{DOCS}}reference/generators/">CLI: bb new</a>.
+</p>
+<h2>Run your first build</h2>
+<pre><code>bb build</code></pre>
+<p>
+  The default build is dev mode: sourcemaps on, no minify, fast. Output lands in
+  <code>dist/packs/BP/</code> and <code>dist/packs/RP/</code>. Pass <code>--release</code> for
+  minified output with no sourcemaps.
+</p>
+<h2>Hot reload into Minecraft</h2>
+<pre><code>bb run --watch</code></pre>
+<p>
+  This builds the project, copies the result into the game dev pack folders, and rebuilds on every
+  save. Reload the world to see updates. Details:
+  <a href="{{DOCS}}guides/hot-reload/">Hot Reload Setup</a>.
+</p>
+<h2>Ship a .mcaddon</h2>
+<pre><code>bb ship</code></pre>
+<p>
+  This runs a release build, validates both manifests, and zips the packs into
+  <code>dist/my-addon-1.0.0.mcaddon</code>. Details:
+  <a href="{{DOCS}}guides/ship/">Shipping a .mcaddon</a>.
+</p>
+<h2>Next steps</h2>
+<ul>
+  <li>
+    Learn the <a href="{{DOCS}}concepts/pipeline/">Build Pipeline</a> and the
+    <a href="{{DOCS}}reference/config/">Config Schema</a>.
+  </li>
+  <li>
+    Bookmark the <a href="{{DOCS}}reference/cli/">CLI reference</a> and the
+    <a href="{{DOCS}}reference/exit-codes/">Exit Codes</a> for CI.
+  </li>
+</ul>

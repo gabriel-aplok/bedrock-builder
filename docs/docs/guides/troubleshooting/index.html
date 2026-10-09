@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Troubleshooting - Bedrock Builder docs</title>
+    <meta name="description" content="Fix deploy target, UUID collisions, entry, ffmpeg, and config drift." />
+    <meta name="theme-color" content="#000000" />
+    <link rel="canonical" href="https://bedrock.trenbankai.dev/docs/guides/troubleshooting/" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../../../assets/icon-32.png" />
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png" />
+    <link rel="manifest" href="../../../assets/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bedrock Builder" />
+    <meta property="og:title" content="Troubleshooting - Bedrock Builder docs" />
+    <meta property="og:description" content="Fix deploy target, UUID collisions, entry, ffmpeg, and config drift." />
+    <meta property="og:url" content="https://bedrock.trenbankai.dev/docs/guides/troubleshooting/" />
+    <meta property="og:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Troubleshooting - Bedrock Builder docs" />
+    <meta name="twitter:description" content="Fix deploy target, UUID collisions, entry, ffmpeg, and config drift." />
+    <meta name="twitter:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <link rel="stylesheet" href="../../../styles.css" />
+  </head>
+  <body data-page="troubleshooting">
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="../../../">Bedrock Builder</a>
+        <nav>
+          <a href="../../../docs/">Docs</a>
+          <a href="../../../#workflow">Workflow</a>
+          <a href="../../../#generators">Generators</a>
+          <a href="../../../#start">Install</a>
+          <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+          <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        </nav>
+        <a class="cta" href="../../../#start">Get Started</a>
+      </div>
+    </header>
+
+    <div class="docs-wrap">
+      <aside class="sidebar">
+        <p class="group">docs</p>
+        <a href="../../" data-page="index">Introduction</a>
+        <a href="../../getting-started/" data-page="getting-started">Getting Started</a>
+        <p class="group">concepts</p>
+        <a href="../../concepts/workspace-layout/" data-page="workspace-layout"
+          >Workspace Layout</a
+        >
+        <a href="../../concepts/packs-and-manifests/" data-page="packs-and-manifests"
+          >Packs and Manifests</a
+        >
+        <a href="../../concepts/pipeline/" data-page="pipeline">Build Pipeline</a>
+        <a href="../../concepts/extensions/" data-page="extensions">Extensions</a>
+        <a href="../../concepts/comparison/" data-page="comparison">Tool Comparison</a>
+        <p class="group">guides</p>
+        <a href="../../guides/hot-reload/" data-page="hot-reload">Hot Reload Setup</a>
+        <a href="../../guides/ship/" data-page="ship">Shipping a .mcaddon</a>
+        <a href="../../guides/custom-deploy/" data-page="custom-deploy">Custom Deploy Path</a>
+        <a href="../../guides/verify-check/" data-page="verify-check">Verify with bb check</a>
+        <a href="../../guides/preview-diff/" data-page="preview-diff">Preview with bb diff</a>
+        <a href="../../guides/verify-harness/" data-page="verify-harness"
+          >Verify with bb harness</a
+        >
+        <a href="../../guides/release-publish/" data-page="release-publish"
+          >Release with bb publish</a
+        >
+        <a href="../../guides/troubleshooting/" data-page="troubleshooting">Troubleshooting</a>
+        <p class="group">reference</p>
+        <a href="../../reference/cli/" data-page="cli">CLI: bb</a>
+        <a href="../../reference/generators/" data-page="generators">CLI: bb new</a>
+        <a href="../../reference/config/" data-page="config">Config Schema</a>
+        <a href="../../reference/exit-codes/" data-page="exit-codes">Exit Codes</a>
+        <a href="../../reference/api/" data-page="api">API Reference</a>
+        <a href="../../changelog/" data-page="changelog">Changelog</a>
+      </aside>
+      <main class="doc">
+        <h1>Troubleshooting</h1>
+<p>Five issues cover most failures. Each lists the symptom, the cause, and the fix.</p>
+<h2>Deploy target missing</h2>
+<p>
+  <code>bb run</code> exits with code 3 and lists every path it checked. No
+  <code>com.mojang</code> exists under any known install.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb check</code></pre></div>
+<p>
+  Use the check output to see the resolved target. When auto detect misses, set a custom path. See
+  <a href="../../guides/custom-deploy/">Custom Deploy Path</a>.
+</p>
+<h2>UUID collisions</h2>
+<p>
+  Two packs share a <code>header.uuid</code>. The game loads one and ignores the other, or imports
+  fail. This happens after copying a project folder by hand.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb manifest --dry-run
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">manifest</span></code></pre></div>
+<p>
+  <code>bb manifest</code> rewrites both manifests with fresh UUIDs and cross-links the RP
+  dependency to the BP uuid. <code>bb init</code> already generates fresh UUIDs per create, so new
+  projects never collide.
+</p>
+<h2>Entry not found</h2>
+<p>
+  Build fails with <code>entry missing</code> and names the expected path. The file was moved,
+  renamed, or never created.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb check --fix</code></pre></div>
+<p>
+  Fix mode creates the missing entry as a stub. When the entry lives elsewhere, set
+  <code>bb.entry</code> in <code>config.json</code> to the real path instead.
+</p>
+<h2>ffmpeg missing</h2>
+<p>
+  <code>bb check</code> reports an extension tool as missing when that extension is enabled. Audio
+  files copy through without conversion. OGG output needs the binary.
+</p>
+<p>
+  Install ffmpeg and ensure it sits on PATH, then rerun <code>bb check</code>. The check stays green
+  without it, since audio copy is a fallback, not a failure.
+</p>
+<h2>Config drift</h2>
+<p>
+  Version in <code>config.json</code> differs from one or both manifests. The game shows a stale
+  version, or ship names the zip wrong.
+</p>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb version 1.1.0</code></pre></div>
+<p>
+  <code>bb version</code> writes one version to the config plus both manifests. Run it after any
+  manual manifest edit. <code>bb ship</code> validates manifests before zipping and stops on
+  mismatch with exit code 4.
+</p>
+ <nav class="pager"><a href="../release-publish/"><span>Previous</span>Release with bb publish</a><a href="../../reference/cli/" style="text-align:right"><span>Next</span>CLI: bb</a></nav>
+        <p class="edit-link">
+          <a href="https://github.com/gabriel-aplok/bedrock-builder/tree/main/docs/content/troubleshooting.html"
+            >Edit this page</a
+          >
+        </p>
+      </main>
+    </div>
+
+    <footer>
+      <p>
+        <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+        <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        <a href="https://www.npmjs.com/package/@aplok/bedrock-builder">npm</a>
+      </p>
+      <p>Built for Minecraft Bedrock developers. zlib licensed.</p>
+    </footer>
+    <script>
+      document.querySelectorAll(".sidebar a[data-page]").forEach((a) => {
+        if (a.getAttribute("data-page") === document.body.dataset.page) a.classList.add("active");
+      });
+      document.querySelectorAll(".codeblock").forEach((block) => {
+        const btn = block.querySelector(".copy-btn");
+        const code = block.querySelector("code");
+        if (!btn || !code) return;
+        btn.addEventListener("click", async () => {
+          const clone = code.cloneNode(true);
+          clone.querySelectorAll("[data-copy-skip]").forEach((el) => el.remove());
+          const text = clone.innerText;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const holder = document.createElement("pre");
+            holder.textContent = text;
+            holder.style.position = "fixed";
+            holder.style.opacity = "0";
+            document.body.appendChild(holder);
+            const range = document.createRange();
+            range.selectNodeContents(holder);
+            const sel = getSelection();
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(range);
+              document.execCommand("copy");
+              sel.removeAllRanges();
+            }
+            holder.remove();
+          }
+          btn.classList.add("copied");
+          btn.setAttribute("aria-label", "Copied");
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.setAttribute("aria-label", "Copy code");
+          }, 1500);
+        });
+      });
+    </script>
+  </body>
+</html>

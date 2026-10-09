@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{TITLE}} - Bedrock Builder docs</title>
+    <meta name="description" content="{{DESC}}" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="canonical" href="https://bedrock.trenbankai.dev/{{CANONICAL}}" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ROOT}}assets/icon-32.png" />
+    <link rel="apple-touch-icon" href="{{ROOT}}assets/apple-touch-icon.png" />
+    <link rel="manifest" href="{{ROOT}}assets/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bedrock Builder" />
+    <meta property="og:title" content="{{TITLE}} - Bedrock Builder docs" />
+    <meta property="og:description" content="{{DESC}}" />
+    <meta property="og:url" content="https://bedrock.trenbankai.dev/{{CANONICAL}}" />
+    <meta property="og:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{TITLE}} - Bedrock Builder docs" />
+    <meta name="twitter:description" content="{{DESC}}" />
+    <meta name="twitter:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <link rel="stylesheet" href="{{ROOT}}styles.css" />
+  </head>
+  <body data-page="{{PAGE}}">
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="{{ROOT}}">Bedrock Builder</a>
+        <nav>
+          <a href="{{ROOT}}docs/">Docs</a>
+          <a href="{{ROOT}}#workflow">Workflow</a>
+          <a href="{{ROOT}}#generators">Generators</a>
+          <a href="{{ROOT}}#start">Install</a>
+          <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+          <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        </nav>
+        <a class="cta" href="{{ROOT}}#start">Get Started</a>
+      </div>
+    </header>
+
+    <div class="docs-wrap">
+      <aside class="sidebar">
+        <p class="group">docs</p>
+        <a href="{{SIDEBAR}}" data-page="index">Introduction</a>
+        <a href="{{SIDEBAR}}getting-started/" data-page="getting-started">Getting Started</a>
+        <p class="group">concepts</p>
+        <a href="{{SIDEBAR}}concepts/workspace-layout/" data-page="workspace-layout"
+          >Workspace Layout</a
+        >
+        <a href="{{SIDEBAR}}concepts/packs-and-manifests/" data-page="packs-and-manifests"
+          >Packs and Manifests</a
+        >
+        <a href="{{SIDEBAR}}concepts/pipeline/" data-page="pipeline">Build Pipeline</a>
+        <a href="{{SIDEBAR}}concepts/extensions/" data-page="extensions">Extensions</a>
+        <a href="{{SIDEBAR}}concepts/comparison/" data-page="comparison">Tool Comparison</a>
+        <p class="group">guides</p>
+        <a href="{{SIDEBAR}}guides/hot-reload/" data-page="hot-reload">Hot Reload Setup</a>
+        <a href="{{SIDEBAR}}guides/ship/" data-page="ship">Shipping a .mcaddon</a>
+        <a href="{{SIDEBAR}}guides/custom-deploy/" data-page="custom-deploy">Custom Deploy Path</a>
+        <a href="{{SIDEBAR}}guides/verify-check/" data-page="verify-check">Verify with bb check</a>
+        <a href="{{SIDEBAR}}guides/preview-diff/" data-page="preview-diff">Preview with bb diff</a>
+        <a href="{{SIDEBAR}}guides/verify-harness/" data-page="verify-harness"
+          >Verify with bb harness</a
+        >
+        <a href="{{SIDEBAR}}guides/release-publish/" data-page="release-publish"
+          >Release with bb publish</a
+        >
+        <a href="{{SIDEBAR}}guides/troubleshooting/" data-page="troubleshooting">Troubleshooting</a>
+        <p class="group">reference</p>
+        <a href="{{SIDEBAR}}reference/cli/" data-page="cli">CLI: bb</a>
+        <a href="{{SIDEBAR}}reference/generators/" data-page="generators">CLI: bb new</a>
+        <a href="{{SIDEBAR}}reference/config/" data-page="config">Config Schema</a>
+        <a href="{{SIDEBAR}}reference/exit-codes/" data-page="exit-codes">Exit Codes</a>
+        <a href="{{SIDEBAR}}reference/api/" data-page="api">API Reference</a>
+        <a href="{{SIDEBAR}}changelog/" data-page="changelog">Changelog</a>
+      </aside>
+      <main class="doc">
+        {{BODY}} {{PAGER}}
+        <p class="edit-link">
+          <a href="https://github.com/gabriel-aplok/bedrock-builder/tree/main/docs/content/{{EDIT}}"
+            >Edit this page</a
+          >
+        </p>
+      </main>
+    </div>
+
+    <footer>
+      <p>
+        <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+        <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        <a href="https://www.npmjs.com/package/@aplok/bedrock-builder">npm</a>
+      </p>
+      <p>Built for Minecraft Bedrock developers. zlib licensed.</p>
+    </footer>
+    <script>
+      document.querySelectorAll(".sidebar a[data-page]").forEach((a) => {
+        if (a.getAttribute("data-page") === document.body.dataset.page) a.classList.add("active");
+      });
+      document.querySelectorAll(".codeblock").forEach((block) => {
+        const btn = block.querySelector(".copy-btn");
+        const code = block.querySelector("code");
+        if (!btn || !code) return;
+        btn.addEventListener("click", async () => {
+          const clone = code.cloneNode(true);
+          clone.querySelectorAll("[data-copy-skip]").forEach((el) => el.remove());
+          const text = clone.innerText;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const holder = document.createElement("pre");
+            holder.textContent = text;
+            holder.style.position = "fixed";
+            holder.style.opacity = "0";
+            document.body.appendChild(holder);
+            const range = document.createRange();
+            range.selectNodeContents(holder);
+            const sel = getSelection();
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(range);
+              document.execCommand("copy");
+              sel.removeAllRanges();
+            }
+            holder.remove();
+          }
+          btn.classList.add("copied");
+          btn.setAttribute("aria-label", "Copied");
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.setAttribute("aria-label", "Copy code");
+          }, 1500);
+        });
+      });
+    </script>
+  </body>
+</html>

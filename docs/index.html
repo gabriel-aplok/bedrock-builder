@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bedrock Builder - Build tools for Minecraft Bedrock add-ons</title>
+    <meta
+      name="description"
+      content="Bedrock Builder is a fast build tool for Minecraft Bedrock add-ons. Create with bb init, generate 27 feature types with bb new, hot reload with bb run --watch, ship with bb ship."
+    />
+    <meta
+      name="keywords"
+      content="minecraft bedrock, bedrock addon, mcaddon, bb cli, bedrock builder, minecraft scripting, behavior pack, resource pack"
+    />
+    <meta name="author" content="Bedrock Builder" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://bedrock.trenbankai.dev/" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/icon-32.png" />
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
+    <link rel="manifest" href="./assets/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bedrock Builder" />
+    <meta
+      property="og:title"
+      content="Bedrock Builder - Build tools for Minecraft Bedrock add-ons"
+    />
+    <meta
+      property="og:description"
+      content="Create, generate, hot reload, and ship Bedrock add-ons from one bb binary."
+    />
+    <meta property="og:url" content="https://bedrock.trenbankai.dev/" />
+    <meta property="og:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Bedrock Builder - Build tools for Minecraft Bedrock add-ons"
+    />
+    <meta
+      name="twitter:description"
+      content="Create, generate, hot reload, and ship Bedrock add-ons from one bb binary."
+    />
+    <meta name="twitter:image" content="https://bedrock.trenbankai.dev/assets/og-banner.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "applicationCategory": "DeveloperApplication",
+        "name": "Bedrock Builder",
+        "operatingSystem": "Windows, macOS, Linux",
+        "offers": { "@type": "Offer", "price": "0" },
+        "description": "Build tools for Minecraft Bedrock add-ons. Create, generate, hot reload, and ship from one bb binary."
+      }
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="./">Bedrock Builder</a>
+        <nav>
+          <a href="./docs/">Docs</a>
+          <a href="#workflow">Workflow</a>
+          <a href="#generators">Generators</a>
+          <a href="#start">Install</a>
+          <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+          <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        </nav>
+        <a class="cta" href="#start">Get Started</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>The Bedrock build tool that writes the boring files.</h1>
+        <p class="lead">
+          <code>bb init</code> creates the project. <code>bb new</code> writes the item, block,
+          entity, recipe, loot, and lang entries. <code>bb run --watch</code> puts them in the game
+          on every save.
+        </p>
+        <p class="hero-actions">
+          <a class="cta" href="#start">Get Started</a>
+          <a class="ghost" href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+        </p>
+        <div class="terminal" aria-label="Terminal demo">
+          <div class="codeblock-bar tinted"><span></span><span></span><span></span></div>
+          <div class="terminal-body" id="demo"></div>
+        </div>
+        <ul class="ticks">
+          <li>TypeScript or JavaScript</li>
+          <li>Windows, macOS, Linux</li>
+          <li>zlib licensed</li>
+        </ul>
+      </section>
+
+      <section id="pain">
+        <p class="kicker">create</p>
+        <h2>Start from a project that builds.</h2>
+        <p>
+          <code>bb init</code> writes config, both manifests with fresh UUIDs, a working entry file,
+          and the texture registries. The result passes <code>bb check</code> on the first run.
+        </p>
+        <div class="codeblock">
+          <div class="codeblock-bar">
+            <span></span><span></span><span></span
+            ><button class="copy-btn" type="button" aria-label="Copy code">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                <path
+                  d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"
+                />
+              </svg>
+            </button>
+          </div>
+          <pre><code><span class="prompt" data-copy-skip>$ </span>bb <span class="f">init</span> my-addon
+<span class="prompt" data-copy-skip>$ </span>cd my-addon
+<span class="prompt" data-copy-skip>$ </span>npm install</code></pre>
+        </div>
+        <div class="grid2">
+          <article>
+            <h3>Deploy means copying folders by hand.</h3>
+            <p>
+              Build the script, copy both packs into com.mojang, reload the world. Every save.
+              <code>bb run --watch</code> does the copy on every save.
+            </p>
+            <div class="codeblock">
+              <div class="codeblock-bar">
+                <span></span><span></span><span></span
+                ><button class="copy-btn" type="button" aria-label="Copy code">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                    <path
+                      d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <pre><code><span class="prompt" data-copy-skip>$ </span>bb <span class="f">run</span> <span class="k">--watch</span></code></pre>
+            </div>
+          </article>
+          <article>
+            <h3>Shipping means zipping by hand.</h3>
+            <p>
+              Two folders, specific names inside the zip, version in the filename.
+              <code>bb ship</code> builds release, checks the manifests, and writes
+              <code>name-version.mcaddon</code>.
+            </p>
+            <div class="codeblock">
+              <div class="codeblock-bar">
+                <span></span><span></span><span></span
+                ><button class="copy-btn" type="button" aria-label="Copy code">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                    <path
+                      d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <pre><code><span class="prompt" data-copy-skip>$ </span>bb <span class="f">ship</span></code></pre>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="workflow">
+        <p class="kicker">workflow</p>
+        <h2>Generate, run, ship.</h2>
+        <div class="grid2">
+          <article>
+            <h3>Generate</h3>
+            <div class="codeblock">
+              <div class="codeblock-bar">
+                <span></span><span></span><span></span
+                ><button class="copy-btn" type="button" aria-label="Copy code">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                    <path
+                      d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <pre><code><span class="prompt" data-copy-skip>$ </span>bb <span class="f">new</span> weapon fire_sword <span class="k">--mode</span> 3d
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">new</span> block glow_block <span class="k">--light</span> 12</code></pre>
+            </div>
+            <p>
+              27 types. Each writes every linked file, or nothing when files conflict. See the
+              <a href="#generators">full list</a>.
+            </p>
+          </article>
+          <article>
+            <h3>Run</h3>
+            <div class="codeblock">
+              <div class="codeblock-bar">
+                <span></span><span></span><span></span
+                ><button class="copy-btn" type="button" aria-label="Copy code">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                    <path
+                      d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <pre><code><span class="prompt" data-copy-skip>$ </span>bb <span class="f">build</span>
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">run</span> <span class="k">--watch</span></code></pre>
+            </div>
+            <p>
+              <code>build</code> bundles <code>src/main.ts</code> and mirrors both packs.
+              <code>run</code> copies the result into the game's dev folders.
+            </p>
+          </article>
+          <article>
+            <h3>Verify</h3>
+            <div class="codeblock">
+              <div class="codeblock-bar">
+                <span></span><span></span><span></span
+                ><button class="copy-btn" type="button" aria-label="Copy code">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                    <path
+                      d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <pre><code><span class="prompt" data-copy-skip>$ </span>bb <span class="f">check</span>
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">check</span> <span class="k">--fix</span>
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">harness</span></code></pre>
+            </div>
+            <p>
+              <code>check</code> lists what is missing. <code>--fix</code> creates it.
+              <code>harness</code> cross-checks every icon, texture, recipe, and spawn reference in
+              dist.
+            </p>
+          </article>
+          <article>
+            <h3>Release</h3>
+            <div class="codeblock">
+              <div class="codeblock-bar">
+                <span></span><span></span><span></span
+                ><button class="copy-btn" type="button" aria-label="Copy code">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                    <path
+                      d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <pre><code><span class="prompt" data-copy-skip>$ </span>bb <span class="f">version</span> 1.1.0
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">publish</span> <span class="k">--bump</span> minor <span class="k">--tag</span> <span class="k">--push</span></code></pre>
+            </div>
+            <p>
+              <code>version</code> writes one version to config plus both manifests.
+              <code>publish</code> ships, harnesses, tags, and pushes.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="generators">
+        <p class="kicker">generate</p>
+        <h2><code>bb new</code> writes the files you would forget.</h2>
+        <p>
+          A weapon is an item JSON, an atlas key, and a lang line. In 3D mode it is also an
+          attachable plus a render controller. The generator writes all of them or writes nothing
+          when files conflict.
+        </p>
+        <div class="codeblock">
+          <div class="codeblock-bar">
+            <span></span><span></span><span></span
+            ><button class="copy-btn" type="button" aria-label="Copy code">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                <path
+                  d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"
+                />
+              </svg>
+            </button>
+          </div>
+          <pre><code><span class="prompt" data-copy-skip>$ </span>bb <span class="f">new</span> weapon fire_sword <span class="k">--mode</span> 3d <span class="k">--icon</span> sword
+  <span class="n">create</span>  packs/BP/items/fire_sword.item.json
+  <span class="n">create</span>  packs/RP/attachables/fire_sword.attachable.json
+  <span class="n">create</span>  packs/RP/render_controllers/fire_sword.rc.json
+  <span class="n">update</span>  item_texture.json + en_US.lang</code></pre>
+        </div>
+        <details>
+          <summary>All 27 generator types</summary>
+          <p>
+            weapon, tool, armor, item, entity, block, recipe, loot, spawn, trade, dialogue,
+            animation, equipment, feature, feature_rule, particle, fog, function, voxel_shape,
+            biome, camera, item_catalog, sound, biomes_client, block_culling, dimension, ui.
+          </p>
+        </details>
+      </section>
+
+      <section>
+        <p class="kicker">iterate</p>
+        <h2>Save, reload the world.</h2>
+        <div class="codeblock">
+          <div class="codeblock-bar">
+            <span></span><span></span><span></span
+            ><button class="copy-btn" type="button" aria-label="Copy code">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                <path
+                  d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"
+                />
+              </svg>
+            </button>
+          </div>
+          <pre><code><span class="prompt" data-copy-skip>$ </span>bb <span class="f">run</span> <span class="k">--watch</span>
+  watching packs/ and src/
+  build OK, synced BP + RP
+  build OK, synced BP + RP</code></pre>
+        </div>
+        <p>
+          The bundle rebuilds through esbuild. Type errors print on save through a parallel
+          <code>tsc --watch</code> and never block the rebuild. <code>--no-types</code> turns that
+          off.
+        </p>
+      </section>
+
+      <section id="compare">
+        <p class="kicker">scope</p>
+        <h2>Plain packs in, plain packs out.</h2>
+        <p>
+          Bedrock Builder covers one project: create, generate, build, run, ship. Output is standard
+          BP and RP folders, so bridge., Regolith, and the Microsoft tools can read it. No
+          proprietary project format, no lock-in.
+          <a href="./docs/concepts/comparison/">How it compares</a>.
+        </p>
+      </section>
+
+      <section id="start">
+        <p class="kicker">install</p>
+        <h2>Four commands to a running add-on.</h2>
+        <p>
+          <code>init</code> writes the project. <code>npm install</code> fetches deps.
+          <code>run --watch</code> keeps the game in sync.
+        </p>
+        <div class="codeblock">
+          <div class="codeblock-bar">
+            <span></span><span></span><span></span
+            ><button class="copy-btn" type="button" aria-label="Copy code">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+                <path
+                  d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"
+                />
+              </svg>
+            </button>
+          </div>
+          <pre><code><span class="prompt" data-copy-skip>$ </span>bb <span class="f">init</span> my-addon
+<span class="prompt" data-copy-skip>$ </span>cd my-addon
+<span class="prompt" data-copy-skip>$ </span>npm install
+<span class="prompt" data-copy-skip>$ </span>bb <span class="f">run</span> <span class="k">--watch</span></code></pre>
+        </div>
+        <p>
+          <a class="cta" href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+          <a class="ghost" href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        <a href="https://github.com/gabriel-aplok/bedrock-builder">GitHub</a>
+        <a href="https://discord.com/invite/PppEgBdss4">Discord</a>
+        <a href="https://www.npmjs.com/package/@aplok/bedrock-builder">npm</a>
+      </p>
+      <p>Built for Minecraft Bedrock developers. zlib licensed.</p>
+    </footer>
+    <script>
+      (function () {
+        const el = document.getElementById("demo");
+        if (!el) return;
+        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const script = [
+          { type: "cmd", text: "bb new weapon fire_sword --mode 3d" },
+          { type: "ok", text: "create  packs/BP/items/fire_sword.item.json" },
+          { type: "ok", text: "create  packs/RP/attachables/fire_sword.attachable.json" },
+          { type: "ok", text: "update  item_texture.json + en_US.lang" },
+          { type: "cmd", text: "bb run --watch" },
+          { type: "ok", text: "watching packs/ and src/" },
+          { type: "ok", text: "build OK, synced BP + RP" },
+          { type: "ok", text: "build OK, synced BP + RP" },
+        ];
+        if (reduce) {
+          for (const line of script) {
+            const div = document.createElement("div");
+            div.className = "line";
+            if (line.type === "cmd") {
+              const prompt = document.createElement("span");
+              prompt.className = "prompt";
+              prompt.textContent = "$ ";
+              const cmd = document.createElement("span");
+              cmd.className = "cmd";
+              cmd.textContent = line.text;
+              div.append(prompt, cmd);
+            } else {
+              const ok = document.createElement("span");
+              ok.className = "ok";
+              ok.textContent = line.text;
+              div.append(ok);
+            }
+            el.appendChild(div);
+          }
+          return;
+        }
+        let li = 0;
+        let ci = 0;
+        let div = null;
+        function nextLine() {
+          if (li >= script.length) {
+            const caret = document.createElement("span");
+            caret.className = "caret";
+            el.appendChild(caret);
+            setTimeout(() => {
+              el.innerHTML = "";
+              li = 0;
+              ci = 0;
+              div = null;
+              nextLine();
+            }, 4000);
+            return;
+          }
+          const line = script[li];
+          div = document.createElement("div");
+          div.className = "line";
+          if (line.type === "cmd") {
+            div.innerHTML = '<span class="prompt">$ </span><span class="cmd"></span>';
+          } else {
+            div.innerHTML = '<span class="ok"></span>';
+          }
+          el.appendChild(div);
+          ci = 0;
+          tick();
+        }
+        function tick() {
+          const line = script[li];
+          const span = div.querySelector(line.type === "cmd" ? ".cmd" : ".ok");
+          if (ci <= line.text.length) {
+            span.textContent = line.text.slice(0, ci);
+            ci++;
+            setTimeout(tick, line.type === "cmd" ? 45 : 12);
+          } else {
+            li++;
+            setTimeout(nextLine, line.type === "cmd" ? 350 : 250);
+          }
+        }
+        const seen = new IntersectionObserver(
+          (entries) => {
+            if (entries[0].isIntersecting) {
+              nextLine();
+              seen.disconnect();
+            }
+          },
+          { threshold: 0.3 },
+        );
+        seen.observe(el);
+      })();
+      document.querySelectorAll(".codeblock").forEach((block) => {
+        const btn = block.querySelector(".copy-btn");
+        const code = block.querySelector("code");
+        if (!btn || !code) return;
+        btn.addEventListener("click", async () => {
+          const clone = code.cloneNode(true);
+          clone.querySelectorAll("[data-copy-skip]").forEach((el) => el.remove());
+          const text = clone.innerText;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const holder = document.createElement("pre");
+            holder.textContent = text;
+            holder.style.position = "fixed";
+            holder.style.opacity = "0";
+            document.body.appendChild(holder);
+            const range = document.createRange();
+            range.selectNodeContents(holder);
+            const sel = getSelection();
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(range);
+              document.execCommand("copy");
+              sel.removeAllRanges();
+            }
+            holder.remove();
+          }
+          btn.classList.add("copied");
+          btn.setAttribute("aria-label", "Copied");
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.setAttribute("aria-label", "Copy code");
+          }, 1500);
+        });
+      });
+    </script>
+  </body>
+</html>

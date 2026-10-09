@@ -1,0 +1,37 @@
+<h1>Verify with bb harness</h1>
+<p>
+  <code>bb harness</code> builds <code>dist/</code> and cross-checks every reference inside it. Use
+  it when the pack loads in game but items miss icons, blocks miss textures, or spawn rules point
+  nowhere.
+</p>
+<pre><code>bb harness
+bb harness --no-build
+bb harness --strict
+bb harness --json</code></pre>
+<h2>What it checks</h2>
+<ul>
+  <li>Every JSON file parses. Invalid files fail with the parse error.</li>
+  <li>Both <code>packs/BP/</code> and <code>packs/RP/</code> exist in dist.</li>
+  <li>Texture and model paths resolve to real files.</li>
+  <li>Item icon keys exist in <code>item_texture.json</code>.</li>
+  <li>Block material textures exist in <code>terrain_texture.json</code>.</li>
+  <li>Spawn rule identifiers match a defined entity.</li>
+  <li>Recipe identifiers stay unique across the pack.</li>
+</ul>
+<h2>Skip the rebuild</h2>
+<p>
+  <code>--no-build</code> checks the current <code>dist/</code> without rebuilding. Use it after a
+  manual edit of dist, or to recheck the same output twice.
+</p>
+<h2>Strict mode</h2>
+<p>
+  <code>--strict</code> turns two warnings into failures: a missing <code>pack_icon.png</code> in
+  either pack dir, and any lang key that nothing references. Default mode skips both. Use strict in
+  CI to catch dead keys and missing icons before release.
+</p>
+<h2>Failure output</h2>
+<p>
+  Failures print as <code>harness: &lt;file&gt;: &lt;reason&gt;</code>, up to 20 lines, then a count
+  of the rest. Exit code is 11. <code>bb publish</code> runs the same check and stops the release
+  when it fails.
+</p>

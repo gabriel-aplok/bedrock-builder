@@ -1,0 +1,78 @@
+<h1>Exit Codes</h1>
+<p>
+  Every failure exits with a distinct code. Use them in CI to tell a fixable config problem from a
+  missing game install.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>0</code></td>
+      <td>Success.</td>
+    </tr>
+    <tr>
+      <td><code>1</code></td>
+      <td>Generic error. Config unreadable, unknown command, unexpected failure.</td>
+    </tr>
+    <tr>
+      <td><code>2</code></td>
+      <td>Invalid config. Schema failure, bad JSON, missing packs, missing entry, bad version.</td>
+    </tr>
+    <tr>
+      <td><code>3</code></td>
+      <td>
+        Deploy target not found. No com.mojang under any known install, or custom path missing.
+      </td>
+    </tr>
+    <tr>
+      <td><code>4</code></td>
+      <td>Ship failure. Manifest validation failed or the zip step failed.</td>
+    </tr>
+    <tr>
+      <td><code>5</code></td>
+      <td>Generate failure. Generator conflict without --force, bad flags, unwritable plan.</td>
+    </tr>
+    <tr>
+      <td><code>6</code></td>
+      <td>Typecheck failure. tsc --noEmit reported diagnostics.</td>
+    </tr>
+    <tr>
+      <td><code>7</code></td>
+      <td>Bundle failure. esbuild could not compile the entry.</td>
+    </tr>
+    <tr>
+      <td><code>8</code></td>
+      <td>Init failure. Bad name, non-empty dir without --force, create write failed.</td>
+    </tr>
+    <tr>
+      <td><code>9</code></td>
+      <td>Manifest failure. Layout undetected or rewrite failed.</td>
+    </tr>
+    <tr>
+      <td><code>10</code></td>
+      <td>Version failure. Bad semver or write failed.</td>
+    </tr>
+    <tr>
+      <td><code>11</code></td>
+      <td>Harness failure. A dist reference has no matching file.</td>
+    </tr>
+    <tr>
+      <td><code>12</code></td>
+      <td>Publish failure. Bad bump, git tag failed, git push failed.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>JSON reports</h2>
+<pre><code>bb build --json
+bb check --json</code></pre>
+<p>
+  <code>build</code>, <code>ship</code>, <code>check</code>, <code>harness</code>,
+  <code>publish</code>, <code>clean</code>, <code>init</code>, <code>manifest</code>, and
+  <code>version</code> accept <code>--json</code>. Success prints one report object. Failure prints
+  one error object with the code. Parse stdout, never stderr.
+</p>

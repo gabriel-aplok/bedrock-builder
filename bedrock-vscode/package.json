@@ -1,0 +1,121 @@
+{
+  "name": "bedrock-vscode",
+  "displayName": "Bedrock Builder",
+  "description": "Complete addon dev environment for Minecraft Bedrock.",
+  "version": "0.1.0",
+  "publisher": "aplok",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "activationEvents": [
+    "onLanguage:json",
+    "onLanguage:jsonc",
+    "onLanguage:typescript",
+    "onLanguage:javascript"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "vsix": "npx --yes @vscode/vsce package --no-dependencies"
+  },
+  "dependencies": {
+    "@aplok/bedrock-builder": "file:.."
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.6.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "bedrock.build",
+        "title": "Bedrock: Build"
+      },
+      {
+        "command": "bedrock.run",
+        "title": "Bedrock: Run in game"
+      },
+      {
+        "command": "bedrock.ship",
+        "title": "Bedrock: Ship .mcaddon"
+      },
+      {
+        "command": "bedrock.check",
+        "title": "Bedrock: Check project"
+      },
+      {
+        "command": "bedrock.clean",
+        "title": "Bedrock: Clean output"
+      },
+      {
+        "command": "bedrock.new",
+        "title": "Bedrock: New feature"
+      },
+      {
+        "command": "bedrock.schema.select",
+        "title": "Bedrock: Select schema version"
+      },
+      {
+        "command": "bedrock.schema.refresh",
+        "title": "Bedrock: Refresh schemas"
+      },
+      {
+        "command": "bedrock.scripts.check",
+        "title": "Bedrock: Check scripts"
+      },
+      {
+        "command": "bedrock.harness",
+        "title": "Bedrock: Test content links"
+      },
+      {
+        "command": "bedrock.watch.start",
+        "title": "Bedrock: Start watch deploy"
+      },
+      {
+        "command": "bedrock.watch.stop",
+        "title": "Bedrock: Stop watch deploy"
+      }
+    ],
+    "configuration": {
+      "title": "Bedrock",
+      "properties": {
+        "bedrock.configPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to config.json, relative to the workspace folder. Empty means auto detect."
+        },
+        "bedrock.schema.version": {
+          "type": "string",
+          "default": "latest",
+          "description": "Mojang bedrock-schemas version: latest, beta, or an exact version."
+        },
+        "bedrock.schema.auto": {
+          "type": "boolean",
+          "default": true,
+          "description": "Download schemas and wire JSON validation on startup."
+        },
+        "bedrock.script.check": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check script entry and server types on startup."
+        },
+        "bedrock.verbose": {
+          "type": "boolean",
+          "default": false,
+          "description": "Verbose builder logging."
+        }
+      }
+    }
+  }
+}

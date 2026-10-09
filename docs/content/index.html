@@ -1,0 +1,40 @@
+<h1>Bedrock Builder documentation</h1>
+<p>
+  Bedrock Builder is a build tool for Minecraft Bedrock add-ons. One binary, called <code>bb</code>,
+  creates the project, generates features, bundles scripts, deploys into the game, and ships the
+  release zip.
+</p>
+<p>
+  Output is standard behavior and resource pack folders. Other tools can read them. No proprietary
+  project format, no lock-in.
+</p>
+<h2>Start here</h2>
+<p>
+  <a href="{{DOCS}}getting-started/">Getting Started</a> creates a project, builds it, hot reloads
+  it into Minecraft, and ships a <code>.mcaddon</code>. Five minutes, four commands.
+</p>
+<p>
+  <a href="{{DOCS}}reference/generators/">bb new</a> writes every linked file for a feature in one
+  command. 27 types, from weapons to dimensions.
+</p>
+<h2>How the docs are organized</h2>
+<ul>
+  <li>Concepts explain the workspace layout, the packs, and the build pipeline.</li>
+  <li>Guides cover hot reload, shipping, and custom deploy paths.</li>
+  <li>
+    Reference lists every command, every generator flag, the config schema, and the exit codes.
+  </li>
+</ul>
+<h2>At a glance</h2>
+<ul>
+  <li>
+    14 commands: <code>init</code>, <code>build</code>, <code>watch</code>, <code>run</code>,
+    <code>ship</code>, <code>clean</code>, <code>folders</code>, <code>ext</code>,
+    <code>check</code>, <code>new</code>, <code>manifest</code>, <code>version</code>,
+    <code>harness</code>, <code>publish</code>.
+  </li>
+  <li>
+    27 generators under <code>bb new</code>. Each writes all linked files or nothing on conflict.
+  </li>
+  <li>Runs on Node 20.19 or later, on Windows, macOS, and Linux.</li>
+</ul>

@@ -1,0 +1,38 @@
+<h1>Hot Reload Setup</h1>
+<p>
+  <code>bb run --watch</code> builds the project, copies the result into the game dev pack folders,
+  and rebuilds on every save. Reload the world to see updates.
+</p>
+<pre><code>bb run --watch</code></pre>
+<h2>How it works</h2>
+<ul>
+  <li>
+    First run is a full build plus a clean copy into
+    <code>development_behavior_packs/&lt;name&gt;/</code> and
+    <code>development_resource_packs/&lt;name&gt;/</code>.
+  </li>
+  <li>Saves batch at 100ms. One log line per batch, not per file.</li>
+  <li>Temp files are ignored. Only pack and source changes trigger rebuilds.</li>
+  <li>
+    Type errors print through a parallel <code>tsc --watch</code> and never block the rebuild. Pass
+    <code>--no-types</code> to turn that off.
+  </li>
+</ul>
+<h2>Retail deploy targets</h2>
+<p>
+  On Windows the retail target checks the Bedrock launcher, the Preview launcher, the Store build,
+  the Store beta, and both Education installs. On macOS and Linux it checks the mcpelauncher homes.
+  When no install is found the command exits with code 3 and lists every path it checked.
+</p>
+<h2>One shot run</h2>
+<pre><code>bb run
+bb run --release</code></pre>
+<p>
+  Without <code>--watch</code> the command builds once and copies once, then exits. Use
+  <code>--release</code> for a final playtest on minified output.
+</p>
+<h2>When auto detect misses</h2>
+<p>
+  Set a custom path. See
+  <a href="{{DOCS}}guides/custom-deploy/">Custom Deploy Path</a>.
+</p>

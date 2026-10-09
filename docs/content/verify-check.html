@@ -1,0 +1,30 @@
+<h1>Verify with bb check</h1>
+<p>
+  <code>bb check</code> inspects the project and lists what is missing. Run it after create, after
+  cloning, and before shipping.
+</p>
+<pre><code>bb check
+bb check --fix
+bb check --json</code></pre>
+<h2>What it checks</h2>
+<ul>
+  <li>Config loads: name plus version present, semver valid.</li>
+  <li>Both pack dirs exist on disk.</li>
+  <li>Both <code>manifest.json</code> files exist.</li>
+  <li>Entry file exists at <code>bb.entry</code>.</li>
+  <li>Deploy target resolves to a real <code>com.mojang</code> folder.</li>
+  <li>
+    Extension tools on PATH when enabled. Warns only, never fails. Audio copies through without it.
+  </li>
+</ul>
+<h2>Fix mode</h2>
+<p>
+  <code>--fix</code> loads the config leniently, so it runs on broken projects too. It creates
+  missing pack dirs, writes minimal manifests with fresh UUIDs, and creates the entry file. It
+  prints how many items it fixed. Rerun <code>bb check</code> after to confirm green.
+</p>
+<h2>CI use</h2>
+<p>
+  Exit code is 0 when every check passes, 1 on any failure. <code>--json</code> prints one report
+  object with a checks array. Parse stdout, never stderr.
+</p>

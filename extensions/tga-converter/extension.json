@@ -1,0 +1,9 @@
+{
+  "name": "tga-converter",
+  "version": "1.0.0",
+  "description": "convert pack png and jpg textures to tga, except pack_icon.png",
+  "entry": "index.mjs",
+  "dependencies": {
+    "jpeg-js": "^0.4.4"
+  }
+}
