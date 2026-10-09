@@ -11,11 +11,11 @@ import { loadExtensions } from "../pipeline/loader.js";
 import { syncTree } from "../sync.js";
 import { watchTypes } from "../typewatch.js";
 import {
-    createPackWatcher,
-    SaveBatcher,
-    timestamp,
-    waitForReady,
-    type WatchEvent,
+  createPackWatcher,
+  SaveBatcher,
+  timestamp,
+  waitForReady,
+  type WatchEvent,
 } from "../watcher.js";
 import { build } from "./build.js";
 

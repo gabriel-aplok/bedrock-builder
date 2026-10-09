@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 
+import { isRecord } from "@aplok/bedrock-builder";
+
 import {
   REGISTRY_URL,
   SCHEMA_VERSION_BETA,
@@ -11,10 +13,6 @@ import {
 export interface RegistryData {
   tags: { latest: string; beta: string };
   versions: string[];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 // fetch the npm registry doc once, return tags plus a trimmed version list.

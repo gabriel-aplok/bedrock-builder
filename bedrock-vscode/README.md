@@ -5,9 +5,12 @@ Bedrock addon tools for VS Code. Build, deploy, and ship behavior and resource p
 ## Commands
 
 - build, run, ship, check, clean. output goes to the Bedrock channel.
-- new: type pick, name input, sidecar kind picks for item, block, entity.
-- harness: runs the content link check, findings land in the Bedrock channel.
-- scripts check: entry file, tsconfig, and `@minecraft/*` install state.
+- run deploys into the world from `bedrock.run.world`, empty means the dev packs.
+- brarchive: server-optimized pack, server dir from `bedrock.brarchive.serverDir`.
+- update: refresh `@minecraft/server` and the builder, results land in the Bedrock channel.
+- new: type pick, name input, sidecar kind picks for item, block, entity (spawn egg included).
+- harness: runs the content link check, findings land in the Bedrock channel. strict follows `bedrock.harness.strict`.
+- scripts check: runtime imports, BP manifest dependency, and installed server major.
 - watch start and stop: deploy watch with stop control, backed by `startDeployWatch`.
 - schema select and refresh: versioned Mojang schemas.
 
@@ -22,6 +25,9 @@ Bedrock addon tools for VS Code. Build, deploy, and ship behavior and resource p
 - `bedrock.schema.version`: `latest`, `beta`, or exact (for example `1.26.50`).
 - `bedrock.schema.auto`: download and wire schemas on startup.
 - `bedrock.script.check`: check script setup on startup.
+- `bedrock.harness.strict`: strict harness, unused lang keys and missing icons fail.
+- `bedrock.run.world`: deploy into a named world folder, empty means the dev packs.
+- `bedrock.brarchive.serverDir`: folder with the server binary for brarchive.
 - `bedrock.verbose`: builder logging.
 
 ## Build

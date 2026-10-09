@@ -13,6 +13,7 @@ Ship:
                       --world <name> targets one world folder
   run --watch         Hot reload into the game on save
   ship                Release build plus .mcaddon zip
+  brarchive           Server-optimized pack via bedrock_server
   publish             Ship, harness, optional bump, tag, push
 
 Make:
@@ -61,6 +62,13 @@ Command flags:
          --level <0-9>         Zip level, 0 is store-only (default 6)
          --typecheck          Run tsc --noEmit first
          --json               Print the ship report as json
+  brarchive --output <path>   Output pack path
+                              (default: dist/<name>-<version>.mcaddon)
+         --server-dir <path>  Folder with bedrock_server.exe
+                              (default: config, env, ./bedrock_server)
+         --keep-config        Keep pack_optimizer_config.json
+         --typecheck          Run tsc --noEmit first
+         --json               Print the brarchive report as json
   publish --bump <v>        Bump first: patch | minor | major | x.y.z
          --tag               Create git tag v<version>
          --push              Push plus tags

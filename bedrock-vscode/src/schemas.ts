@@ -104,12 +104,10 @@ function toPackGlob(glob: string): string {
   return `**/packs/*/${glob}`;
 }
 
+import { isRecord } from "@aplok/bedrock-builder";
+
 function isManaged(row: unknown): boolean {
-  return (
-    typeof row === "object" &&
-    row !== null &&
-    (row as Record<string, unknown>)[MANAGED_KEY] === true
-  );
+  return isRecord(row) && row[MANAGED_KEY] === true;
 }
 
 async function exists(uri: vscode.Uri): Promise<boolean> {

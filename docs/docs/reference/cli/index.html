@@ -223,6 +223,15 @@
   <code>.mcaddon</code>. Default output is <code>dist/&lt;name&gt;-&lt;version&gt;.mcaddon</code>.
   Default compression is 6. Level 0 stores raw.
 </p>
+<h2>brarchive</h2>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb brarchive [--output &lt;path&gt;] [--server-dir &lt;path&gt;] [--keep-config] [--typecheck] [--json]</code></pre></div>
+<p>
+  Runs a release build, compiles the packs through the windows dedicated server optimizer, and zips
+  the result. The server binary is found through <code>--server-dir</code>, then
+  <code>bb.serverDir</code> in <code>config.json</code>, then the
+  <code>BEDROCK_SERVER_DIR</code> env var, then <code>./bedrock_server</code>. Windows only. A lone
+  resource pack zips at the archive root, like a plain <code>.mcpack</code>.
+</p>
 <h2>publish</h2>
 <div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb publish [--bump &lt;v&gt;] [--tag] [--push] [--dry-run] [--typecheck] [--json]</code></pre></div>
 <p>

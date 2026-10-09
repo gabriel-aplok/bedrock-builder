@@ -156,4 +156,24 @@ describe("loadConfig", () => {
 
     await expect(loadConfig(path)).rejects.toBeInstanceOf(ConfigError);
   });
+
+  it("parses bb.serverDir anchored to the config dir", async () => {
+    const path = await putJson(fixture.root, "config.json", standardConfig({ serverDir: "./srv" }));
+
+    const c = await loadConfig(path);
+    expect(c.serverDir).toBe(join(fixture.root, "srv"));
+  });
+
+  it("defaults serverDir to null when absent", async () => {
+    const path = await putJson(fixture.root, "config.json", standardConfig());
+
+    const c = await loadConfig(path);
+    expect(c.serverDir).toBeNull();
+  });
+
+  it("rejects a non-string bb.serverDir with exit code 2", async () => {
+    const path = await putJson(fixture.root, "config.json", standardConfig({ serverDir: 42 }));
+
+    await expect(loadConfig(path)).rejects.toMatchObject({ name: "ConfigError", exitCode: 2 });
+  });
 });

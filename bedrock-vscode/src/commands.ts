@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 
 import {
   build,
+  brarchive,
+  checkScriptImports,
   clean,
   create,
   deploy,
@@ -10,6 +12,7 @@ import {
   loadConfigLenient,
   pack,
   startDeployWatch,
+  update,
   CREATE_TYPES,
   setJson,
   setVerbose,
@@ -19,7 +22,12 @@ import {
 
 import { output, runTask } from "./channel.js";
 import { resolveProject } from "./config.js";
-import { SETTING_VERBOSE } from "./constants.js";
+import {
+  SETTING_BRARCHIVE_SERVER_DIR,
+  SETTING_HARNESS_STRICT,
+  SETTING_RUN_WORLD,
+  SETTING_VERBOSE,
+} from "./constants.js";
 import { ensureSchemas } from "./schemas.js";
 import { fetchRegistry, pickVersion } from "./schemaVersion.js";
 
@@ -27,6 +35,10 @@ function applyFlags(): void {
   const verbose = vscode.workspace.getConfiguration().get<boolean>(SETTING_VERBOSE, false);
   setVerbose(verbose);
   setJson(false);
+}
+
+function runWorld(): string {
+  return vscode.workspace.getConfiguration().get<string>(SETTING_RUN_WORLD, "").trim();
 }
 
 function configDirOf(configPath: string): string {
@@ -50,8 +62,21 @@ export function registerCommands(
       applyFlags();
       const project = await resolveProject().catch(showResolveError);
       if (!project) return;
-      await runTask("Run", async () => {
-        await deploy(project.config, { watch: false });
+      const world = runWorld();
+      await runTask(world ? `Run (${world})` : "Run", async () => {
+        await deploy(project.config, { watch: false, world: world || undefined });
+      });
+    }),
+    vscode.commands.registerCommand("bedrock.update", async () => {
+      applyFlags();
+      const project = await resolveProject().catch(showResolveError);
+      if (!project) return;
+      await runTask("Update", async () => {
+        const report = await update(project.config, {});
+        if (report.updated.length === 0) output().appendLine("Everything is up to date.");
+        else
+          for (const row of report.updated)
+            output().appendLine(`${row.name}: ${row.from} -> ${row.to}`);
       });
     }),
     vscode.commands.registerCommand("bedrock.ship", async () => {
@@ -62,6 +87,23 @@ export function registerCommands(
         const report = await pack(project.config, {});
         vscode.window
           .showInformationMessage(`Shipped ${report.output}`)
+          .then(undefined, () => undefined);
+      });
+    }),
+    vscode.commands.registerCommand("bedrock.brarchive", async () => {
+      applyFlags();
+      const project = await resolveProject().catch(showResolveError);
+      if (!project) return;
+      const serverDir = vscode.workspace
+        .getConfiguration()
+        .get<string>(SETTING_BRARCHIVE_SERVER_DIR, "")
+        .trim();
+      await runTask("Brarchive", async () => {
+        const report = await brarchive(project.config, {
+          ...(serverDir !== "" ? { serverDir } : {}),
+        });
+        vscode.window
+          .showInformationMessage(`Compiled ${report.output}`)
           .then(undefined, () => undefined);
       });
     }),
@@ -139,17 +181,23 @@ export function registerCommands(
       const project = await resolveProject().catch(showResolveError);
       if (!project) return;
       await runTask("Scripts", async () => {
-        const { checkScripts } = await import("./scripts.js");
-        const issues = await checkScripts(project.folder, project.config);
-        if (issues.length > 0) throw new Error(issues.map((row) => row.message).join("; "));
+        const report = await checkScriptImports(
+          project.config.entry,
+          project.config.__configDir,
+          `${project.config.packs.bp}/manifest.json`,
+        );
+        if (!report.ok) throw new Error(report.fix ?? report.detail);
       });
     }),
     vscode.commands.registerCommand("bedrock.harness", async () => {
       applyFlags();
       const project = await resolveProject().catch(showResolveError);
       if (!project) return;
+      const strict = vscode.workspace
+        .getConfiguration()
+        .get<boolean>(SETTING_HARNESS_STRICT, false);
       await runTask("Harness", async (log) => {
-        const report = await harness(project.config, { build: true });
+        const report = await harness(project.config, { build: true, strict });
         log(`checked ${report.files} files, ${report.jsonFiles} json`);
         for (const failure of report.failures) log(`finding: ${failure}`);
       });
@@ -217,11 +265,17 @@ function showError(err: unknown): void {
 }
 
 // sidecars the planners accept: item and block take recipe plus loot,
-// entity takes equipment plus loot. kind picks, skip returns undefined.
+// entity takes equipment, loot, and spawn egg. kind picks,
+// skip returns undefined.
 async function pickSidecars(
   type: CreateType,
-): Promise<{ recipe?: string; loot?: string; equipment?: string } | undefined> {
-  const out: { recipe?: string; loot?: string; equipment?: string } = {};
+): Promise<{ recipe?: string; loot?: string; equipment?: string; spawnEgg?: boolean } | undefined> {
+  const out: {
+    recipe?: string;
+    loot?: string;
+    equipment?: string;
+    spawnEgg?: boolean;
+  } = {};
   if (type === "item" || type === "block") {
     const recipe = await vscode.window.showQuickPick(["None", "shapeless", "shaped", "furnace"], {
       placeHolder: "Crafting recipe?",
@@ -245,6 +299,11 @@ async function pickSidecars(
     });
     if (loot === undefined) return undefined;
     if (loot !== "None") out.loot = loot;
+    const egg = await vscode.window.showQuickPick(["No", "Yes"], {
+      placeHolder: "Spawn egg?",
+    });
+    if (egg === undefined) return undefined;
+    if (egg === "Yes") out.spawnEgg = true;
   }
   return out;
 }

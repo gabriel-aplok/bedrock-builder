@@ -17,6 +17,7 @@
 - print shell completions with `bb completion [bash|zsh|powershell]`.
 - adopt existing pack folders with `bb import [dir]`.
 - deploy into a named world with `bb run --world <name>`.
+- compile server-optimized packs with `bb brarchive` (windows only).
 - deploy to Preview and Store Beta installs with a `preview` target.
 - add a `loot_table` generator plus `spawn-egg`, recipe `unlock`, and trade `max-uses`/`xp` options.
 

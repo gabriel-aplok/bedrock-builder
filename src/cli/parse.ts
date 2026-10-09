@@ -57,8 +57,9 @@ export const VALUE_FLAGS: Record<string, readonly Command[]> = {
   "--pools": ["new"],
   "--direction": ["new"],
   "--config": [],
-  "--output": ["ship"],
+  "--output": ["ship", "brarchive"],
   "--level": ["ship"],
+  "--server-dir": ["brarchive"],
   "--target-version": ["init"],
   "--builder": ["init"],
   "--pack-version": ["manifest"],
@@ -71,7 +72,7 @@ export const TOGGLE_FLAGS: Record<string, readonly Command[]> = {
   "--release": ["build", "run"],
   "--clean": ["build"],
   "--watch": ["run"],
-  "--typecheck": ["build", "ship", "publish"],
+  "--typecheck": ["build", "ship", "publish", "brarchive"],
   "--stats": ["build"],
   "--no-types": ["watch", "run"],
   "--fix": ["check"],
@@ -86,6 +87,7 @@ export const TOGGLE_FLAGS: Record<string, readonly Command[]> = {
   "--no-install": ["init"],
   "--here": ["init"],
   "--force": ["new", "init", "import"],
+  "--keep-config": ["brarchive"],
   "--spawn-egg": ["new"],
   "--dry-run": ["new", "init", "manifest", "version", "publish", "update", "import"],
   "--list": ["new"],
@@ -149,6 +151,7 @@ const VALUE_KEY: Record<string, keyof CliArgs> = {
   "--direction": "direction",
   "--config": "configPath",
   "--output": "output",
+  "--server-dir": "serverDir",
   "--world": "world",
   "--level": "level",
   "--target-version": "targetVersion",
@@ -255,6 +258,9 @@ export function parseArgs(argv: readonly string[]): CliArgs {
         break;
       case "--force":
         args.force = true;
+        break;
+      case "--keep-config":
+        args.keepConfig = true;
         break;
       case "--spawn-egg":
         args.spawnEgg = true;

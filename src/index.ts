@@ -17,6 +17,8 @@ export { CompletionError, completion, parseCompletionShell } from "./commands/co
 export type { CompletionShell } from "./commands/completion.js";
 export { ImportError, importProject } from "./commands/import.js";
 export type { ImportOptions, ImportReport } from "./commands/import.js";
+export { BrarchiveError, brarchive, resolveServerDir } from "./commands/brarchive.js";
+export type { BrarchiveOptions, BrarchiveReport } from "./commands/brarchive.js";
 export type { UpdateOptions, UpdateReport, UpdatedDep } from "./commands/update.js";
 export type { VersionOptions, VersionReport } from "./commands/version.js";
 export { detectPackLayout, rewriteManifest, rewriteManifests } from "./manifest/rewrite.js";
@@ -198,3 +200,5 @@ export {
 export type { DeployTargets } from "./paths.js";
 
 export { isJson, logger, printJson, setJson, setVerbose } from "./logger.js";
+
+export { isRecord } from "./records.js";

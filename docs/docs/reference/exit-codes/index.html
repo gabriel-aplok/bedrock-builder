@@ -154,16 +154,20 @@
       <td><code>15</code></td>
       <td>Import failure. No pack manifests found, nothing to adopt.</td>
     </tr>
+    <tr>
+      <td><code>16</code></td>
+      <td>Brarchive failure. Server missing, optimizer failed, or no packs compiled.</td>
+    </tr>
   </tbody>
 </table>
 <h2>JSON reports</h2>
 <div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb build --json
 <span class="prompt" data-copy-skip>$ </span>bb <span class="f">check</span> <span class="k">--json</span></code></pre></div>
 <p>
-  <code>build</code>, <code>ship</code>, <code>check</code>, <code>harness</code>,
-  <code>publish</code>, <code>clean</code>, <code>init</code>, <code>manifest</code>, and
-  <code>version</code> accept <code>--json</code>. Success prints one report object. Failure prints
-  one error object with the code. Parse stdout, never stderr.
+  <code>build</code>, <code>ship</code>, <code>brarchive</code>, <code>check</code>,
+  <code>harness</code>, <code>publish</code>, <code>clean</code>, <code>init</code>,
+  <code>manifest</code>, and <code>version</code> accept <code>--json</code>. Success prints one
+  report object. Failure prints one error object with the code. Parse stdout, never stderr.
 </p>
  <nav class="pager"><a href="../config/"><span>Previous</span>Config Schema</a><a href="../api/" style="text-align:right"><span>Next</span>API Reference</a></nav>
         <p class="edit-link">

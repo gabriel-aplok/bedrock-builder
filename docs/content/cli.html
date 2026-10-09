@@ -146,6 +146,15 @@
   <code>.mcaddon</code>. Default output is <code>dist/&lt;name&gt;-&lt;version&gt;.mcaddon</code>.
   Default compression is 6. Level 0 stores raw.
 </p>
+<h2>brarchive</h2>
+<pre><code>bb brarchive [--output &lt;path&gt;] [--server-dir &lt;path&gt;] [--keep-config] [--typecheck] [--json]</code></pre>
+<p>
+  Runs a release build, compiles the packs through the windows dedicated server optimizer, and zips
+  the result. The server binary is found through <code>--server-dir</code>, then
+  <code>bb.serverDir</code> in <code>config.json</code>, then the
+  <code>BEDROCK_SERVER_DIR</code> env var, then <code>./bedrock_server</code>. Windows only. A lone
+  resource pack zips at the archive root, like a plain <code>.mcpack</code>.
+</p>
 <h2>publish</h2>
 <pre><code>bb publish [--bump &lt;v&gt;] [--tag] [--push] [--dry-run] [--typecheck] [--json]</code></pre>
 <p>

@@ -77,14 +77,18 @@
       <td><code>15</code></td>
       <td>Import failure. No pack manifests found, nothing to adopt.</td>
     </tr>
+    <tr>
+      <td><code>16</code></td>
+      <td>Brarchive failure. Server missing, optimizer failed, or no packs compiled.</td>
+    </tr>
   </tbody>
 </table>
 <h2>JSON reports</h2>
 <pre><code>bb build --json
 bb check --json</code></pre>
 <p>
-  <code>build</code>, <code>ship</code>, <code>check</code>, <code>harness</code>,
-  <code>publish</code>, <code>clean</code>, <code>init</code>, <code>manifest</code>, and
-  <code>version</code> accept <code>--json</code>. Success prints one report object. Failure prints
-  one error object with the code. Parse stdout, never stderr.
+  <code>build</code>, <code>ship</code>, <code>brarchive</code>, <code>check</code>,
+  <code>harness</code>, <code>publish</code>, <code>clean</code>, <code>init</code>,
+  <code>manifest</code>, and <code>version</code> accept <code>--json</code>. Success prints one
+  report object. Failure prints one error object with the code. Parse stdout, never stderr.
 </p>

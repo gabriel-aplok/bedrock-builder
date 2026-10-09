@@ -2,9 +2,14 @@
   "name": "bedrock-vscode",
   "displayName": "Bedrock Builder",
   "description": "Complete addon dev environment for Minecraft Bedrock.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "aplok",
-  "license": "MIT",
+  "license": "Zlib",
+  "author": "trenbankai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabriel-aplok/bedrock-builder.git"
+  },
   "type": "module",
   "engines": {
     "vscode": "^1.85.0"
@@ -15,13 +20,8 @@
   "main": "./dist/extension.js",
   "files": [
     "dist",
-    "README.md"
-  ],
-  "activationEvents": [
-    "onLanguage:json",
-    "onLanguage:jsonc",
-    "onLanguage:typescript",
-    "onLanguage:javascript"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -32,9 +32,9 @@
     "@aplok/bedrock-builder": "file:.."
   },
   "devDependencies": {
-    "@types/node": "^22.7.0",
+    "@types/node": "^26.6.0",
     "@types/vscode": "^1.85.0",
-    "typescript": "^5.6.0"
+    "typescript": "^7.0.0"
   },
   "contributes": {
     "commands": [
@@ -47,8 +47,16 @@
         "title": "Bedrock: Run in game"
       },
       {
+        "command": "bedrock.update",
+        "title": "Bedrock: Update dependencies"
+      },
+      {
         "command": "bedrock.ship",
         "title": "Bedrock: Ship .mcaddon"
+      },
+      {
+        "command": "bedrock.brarchive",
+        "title": "Bedrock: Compile brarchive pack"
       },
       {
         "command": "bedrock.check",
@@ -114,6 +122,21 @@
           "type": "boolean",
           "default": false,
           "description": "Verbose builder logging."
+        },
+        "bedrock.harness.strict": {
+          "type": "boolean",
+          "default": false,
+          "description": "Strict harness: unused lang keys and missing icons fail."
+        },
+        "bedrock.run.world": {
+          "type": "string",
+          "default": "",
+          "description": "Deploy into a named world folder. Empty means the dev packs."
+        },
+        "bedrock.brarchive.serverDir": {
+          "type": "string",
+          "default": "",
+          "description": "Folder with bedrock_server.exe. Empty means config, env, then ./bedrock_server."
         }
       }
     }

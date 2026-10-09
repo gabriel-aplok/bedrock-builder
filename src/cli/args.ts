@@ -19,6 +19,7 @@ export const COMMANDS = [
   "update",
   "completion",
   "import",
+  "brarchive",
 ] as const;
 export type Command = (typeof COMMANDS)[number];
 
@@ -43,6 +44,7 @@ export interface CliArgs {
   tag: boolean;
   push: boolean;
   output: string | undefined;
+  serverDir: string | undefined;
   world: string | undefined;
   level: string | undefined;
   // init <name> [namespace].
@@ -118,6 +120,7 @@ export interface CliArgs {
   xp: string | undefined;
   pools: string | undefined;
   force: boolean;
+  keepConfig: boolean;
   dryRun: boolean;
   yes: boolean;
   unknown: string[];
@@ -206,6 +209,7 @@ export function blankArgs(): CliArgs {
     tag: false,
     push: false,
     output: undefined,
+    serverDir: undefined,
     world: undefined,
     level: undefined,
     initName: undefined,
@@ -279,6 +283,7 @@ export function blankArgs(): CliArgs {
     xp: undefined,
     pools: undefined,
     force: false,
+    keepConfig: false,
     dryRun: false,
     yes: false,
     list: false,

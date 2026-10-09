@@ -9,6 +9,9 @@ export const SETTING_CONFIG_PATH = "bedrock.configPath";
 export const SETTING_SCHEMA_VERSION = "bedrock.schema.version";
 export const SETTING_SCHEMA_AUTO = "bedrock.schema.auto";
 export const SETTING_VERBOSE = "bedrock.verbose";
+export const SETTING_HARNESS_STRICT = "bedrock.harness.strict";
+export const SETTING_RUN_WORLD = "bedrock.run.world";
+export const SETTING_BRARCHIVE_SERVER_DIR = "bedrock.brarchive.serverDir";
 export const SETTING_SCRIPT_CHECK = "bedrock.script.check";
 export const SETTING_JSON_SCHEMAS = "json.schemas";
 

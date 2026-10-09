@@ -14,6 +14,7 @@ export interface BedrockConfig {
   minecraft?: { serverVersion?: string };
   extensions?: Array<ExtensionConfig | string>;
   worlds: string[];
+  serverDir: string | null;
   __configDir: string;
 }
 
@@ -28,6 +29,7 @@ export interface Draft {
   minecraft?: { serverVersion?: unknown };
   extensions?: unknown;
   worlds?: unknown;
+  serverDir?: unknown;
 }
 
 // strict semver, no loose parse.
@@ -96,6 +98,7 @@ export function toDraft(parsed: Record<string, unknown>): Draft {
   if (api !== undefined) draft.minecraft = { serverVersion: api };
   if (extensions !== undefined) draft.extensions = extensions;
   if (worlds !== undefined) draft.worlds = worlds;
+  if (cli.serverDir !== undefined) draft.serverDir = cli.serverDir;
   return draft;
 }
 
@@ -124,6 +127,14 @@ export function fillDefaults(draft: Draft, base: string): BedrockConfig {
       throw new ConfigError("deploy.customPath must be a string or null.", 2);
     }
     customPath = deployRaw.customPath;
+  }
+
+  let serverDir: string | null = null;
+  if (draft.serverDir !== undefined && draft.serverDir !== null) {
+    if (typeof draft.serverDir !== "string") {
+      throw new ConfigError("bb.serverDir must be a string or null.", 2);
+    }
+    serverDir = draft.serverDir;
   }
 
   let namespace: string;
@@ -185,6 +196,7 @@ export function fillDefaults(draft: Draft, base: string): BedrockConfig {
     ...(minecraft ? { minecraft } : {}),
     ...(extensions ? { extensions } : {}),
     worlds: Array.isArray(draft.worlds) ? [...draft.worlds] : [],
+    serverDir: serverDir !== null && serverDir !== "" ? anchored(base, serverDir) : serverDir,
     __configDir: base,
   };
 }

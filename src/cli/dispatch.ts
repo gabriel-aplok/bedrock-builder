@@ -6,6 +6,7 @@ import { BundlerError } from "../bundler.js";
 import { build } from "../commands/build.js";
 import { clean } from "../commands/clean.js";
 import { CompletionError, completion, parseCompletionShell } from "../commands/completion.js";
+import { BrarchiveError, brarchive } from "../commands/brarchive.js";
 import { importProject, ImportError } from "../commands/import.js";
 import { create } from "../commands/create.js";
 import { deploy } from "../commands/deploy.js";
@@ -247,6 +248,15 @@ export async function dispatch(args: CliArgs): Promise<number> {
       case "clean":
         await clean(config, { json: args.json });
         return 0;
+      case "brarchive":
+        await brarchive(config, {
+          ...(args.output ? { output: args.output } : {}),
+          ...(args.serverDir ? { serverDir: args.serverDir } : {}),
+          keepConfig: args.keepConfig,
+          json: args.json,
+          typecheck: args.typecheck,
+        });
+        return 0;
       case "update":
         await update(config, { dryRun: args.dryRun, json: args.json });
         return 0;
@@ -354,6 +364,9 @@ export async function dispatch(args: CliArgs): Promise<number> {
       return report(err.message, err.exitCode);
     }
     if (err instanceof PackError) {
+      return report(err.message, err.exitCode);
+    }
+    if (err instanceof BrarchiveError) {
       return report(err.message, err.exitCode);
     }
     if (err instanceof PublishError) {
