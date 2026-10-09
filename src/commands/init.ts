@@ -1,9 +1,9 @@
-import { spawn } from "node:child_process";
+import { execFile } from "node:child_process";
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve } from "node:path";
 
 import * as p from "@clack/prompts";
-import pc from "picocolors";
+import pc from "../colors.js";
 import { logger, printJson } from "../logger.js";
 import { AbortError } from "./create-prompts.js";
 import { buildInitFiles } from "./init-files.js";
@@ -74,9 +74,9 @@ async function latestRange(name: string, fallback: string): Promise<string> {
     return fallback;
   }
   return new Promise((resolve) => {
-    const child = spawn(`npm view ${name} version`, {
-      shell: true,
+    const child = execFile("npm", ["view", name, "version"], {
       timeout: 10000,
+      shell: process.platform === "win32",
     });
     let out = "";
     child.stdout?.on("data", (chunk: Buffer | string) => {
@@ -252,7 +252,7 @@ async function askConfirm(message: string, initial = true): Promise<boolean> {
 
 function runGitInit(dir: string): Promise<boolean> {
   return new Promise((resolve) => {
-    const child = spawn("git init", { cwd: dir, shell: true });
+    const child = execFile("git", ["init"], { cwd: dir });
     child.on("error", () => resolve(false));
     child.on("close", (code) => resolve(code === 0));
   });
@@ -260,7 +260,10 @@ function runGitInit(dir: string): Promise<boolean> {
 
 function runNpmInstall(dir: string): Promise<number> {
   return new Promise((resolve) => {
-    const child = spawn("npm install", { cwd: dir, shell: true });
+    const child = execFile("npm", ["install"], {
+      cwd: dir,
+      shell: process.platform === "win32",
+    });
     child.stdout?.pipe(process.stdout);
     child.stderr?.pipe(process.stderr);
     child.on("error", () => resolve(1));

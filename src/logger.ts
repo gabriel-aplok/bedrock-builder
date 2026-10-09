@@ -1,4 +1,4 @@
-import pc from "picocolors";
+import pc from "./colors.js";
 
 let loud = false;
 let machine = false;

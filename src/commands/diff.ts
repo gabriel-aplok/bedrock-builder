@@ -1,7 +1,7 @@
 import { stat } from "node:fs/promises";
 import { join } from "node:path";
 
-import pc from "picocolors";
+import pc from "../colors.js";
 import type { BedrockConfig } from "../config.js";
 import { toPosix } from "../files/tree.js";
 import { logger, printJson } from "../logger.js";

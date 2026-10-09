@@ -1,5 +1,5 @@
 import * as p from "@clack/prompts";
-import pc from "picocolors";
+import pc from "../colors.js";
 
 import type { BedrockConfig } from "../config.js";
 import { planAnimation } from "../generate/animation.js";
@@ -14,10 +14,10 @@ import { validateNamespace } from "../generate/core/identifier.js";
 import { hasConflict, planTree } from "../generate/core/plan.js";
 import { Tree } from "../generate/core/tree.js";
 import {
-  CREATE_TYPES,
-  type CreateOptions,
-  type CreateType,
-  type PlannedFile,
+    CREATE_TYPES,
+    type CreateOptions,
+    type CreateType,
+    type PlannedFile,
 } from "../generate/core/types.js";
 import { planDialogue } from "../generate/dialogue.js";
 import { planDimension } from "../generate/dimension.js";

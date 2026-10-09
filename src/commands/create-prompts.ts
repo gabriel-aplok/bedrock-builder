@@ -1,5 +1,5 @@
 import * as p from "@clack/prompts";
-import pc from "picocolors";
+import pc from "../colors.js";
 
 import type { BedrockConfig } from "../config.js";
 import { validateName } from "../generate/core/identifier.js";

@@ -1,5 +1,3 @@
-import { ZipArchive } from "archiver";
-import { createWriteStream } from "node:fs";
 import { mkdir, stat } from "node:fs/promises";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 
@@ -7,6 +5,7 @@ import type { BedrockConfig } from "../config.js";
 import { logger, printJson } from "../logger.js";
 import { validatePackManifests } from "../pipeline/manifest.js";
 import { build } from "./build.js";
+import { collectDir, writeZip } from "../pack/zip.js";
 
 export interface PackOptions {
   output?: string | undefined;
@@ -114,55 +113,30 @@ export async function pack(config: BedrockConfig, options: PackOptions = {}): Pr
   return report;
 }
 
-function zipDirs(
+async function zipDirs(
   output: string,
   bp: string,
   rp: string,
   name: string,
   compression: number,
 ): Promise<{ files: number }> {
-  return new Promise<{ files: number }>((done, failed) => {
-    const stream = createWriteStream(output);
-    const zip = new ZipArchive({
-      zlib: { level: compression },
-      store: compression === STORE_ONLY,
-    });
-    let files = 0;
-
-    let finished = false;
-    const finish = (err: Error | null) => {
-      if (finished) return;
-      finished = true;
-      if (err) failed(err);
-      else done({ files });
-    };
-
-    stream.on("close", () => finish(null));
-    stream.on("error", (err: Error) =>
-      finish(new PackError(`Cannot write archive: ${err.message}`)),
-    );
-    zip.on("warning", (err: NodeJS.ErrnoException) => {
-      if (err.code === "ENOENT") logger.warn(`archiver: ${err.message}`);
-      else finish(new PackError(`archiver warning: ${err.message}`));
-    });
-    zip.on("error", (err: Error) => finish(new PackError(`archiver error: ${err.message}`)));
-
-    zip.pipe(stream);
-    const quiet = process.env.CI === "true" || !(process.stdout.isTTY ?? false);
-    let shown = 0;
-    zip.on("entry", () => {
-      files++;
+  const quiet = process.env.CI === "true" || !(process.stdout.isTTY ?? false);
+  let shown = 0;
+  const entries = [
+    ...(await collectDir(bp, `${name}_BP`)),
+    ...(await collectDir(rp, `${name}_RP`)),
+  ];
+  try {
+    const result = await writeZip(output, entries, compression, ({ files }) => {
       if (!quiet && files - shown >= 50) {
         shown = files;
         process.stdout.write(`\rPacking... ${files} files`);
       }
     });
-    zip.directory(bp, `${name}_BP`);
-    zip.directory(rp, `${name}_RP`);
-    zip.finalize().catch((err: unknown) => {
-      finish(
-        new PackError(`Cannot finish archive: ${err instanceof Error ? err.message : String(err)}`),
-      );
-    });
-  });
+    return { files: result.files };
+  } catch (err) {
+    throw new PackError(
+      `Cannot write archive: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
 }

@@ -3,7 +3,7 @@ import { mkdir, stat, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
 import * as p from "@clack/prompts";
-import pc from "picocolors";
+import pc from "../colors.js";
 import type { BedrockConfig } from "../config.js";
 import { logger, printJson } from "../logger.js";
 import { resolveDeployTarget } from "../paths.js";

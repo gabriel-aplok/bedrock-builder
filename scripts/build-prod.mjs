@@ -1,8 +1,8 @@
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const tsup = new URL("../node_modules/tsup/dist/cli-default.js", import.meta.url);
-const child = spawn(process.execPath, [fileURLToPath(tsup), "--minify"], {
+const build = new URL("./build.mjs", import.meta.url);
+const child = spawn(process.execPath, [fileURLToPath(build), "--minify"], {
   env: { ...process.env, BB_PROD: "1" },
   stdio: "inherit",
 });

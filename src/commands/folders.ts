@@ -2,7 +2,7 @@ import { mkdir, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 
 import * as p from "@clack/prompts";
-import pc from "picocolors";
+import pc from "../colors.js";
 
 import type { BedrockConfig } from "../config.js";
 
