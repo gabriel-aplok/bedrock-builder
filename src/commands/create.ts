@@ -1,5 +1,5 @@
-import * as p from "@clack/prompts";
 import pc from "../colors.js";
+import * as p from "../prompts.js";
 
 import type { BedrockConfig } from "../config.js";
 import { planAnimation } from "../generate/animation.js";

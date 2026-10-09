@@ -2,9 +2,9 @@ import { execFile } from "node:child_process";
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve } from "node:path";
 
-import * as p from "@clack/prompts";
 import pc from "../colors.js";
 import { logger, printJson } from "../logger.js";
+import * as p from "../prompts.js";
 import { AbortError } from "./create-prompts.js";
 import { buildInitFiles } from "./init-files.js";
 

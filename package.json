@@ -62,15 +62,14 @@
     "prepublishOnly": "npm run build:prod"
   },
   "dependencies": {
-    "@clack/prompts": "^1.8.1",
-    "chokidar": "^5.0.0",
-    "esbuild": "^0.28.2"
+    "chokidar": "5.0.0",
+    "esbuild": "0.28.2"
   },
   "devDependencies": {
-    "@types/node": "^26.0.0",
-    "typescript": "^7.0.2",
-    "vitest": "^5.0.3",
-    "prettier": "^3.6.2"
+    "@types/node": "26.6.4",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3",
+    "prettier": "3.9.9"
   },
   "engines": {
     "node": ">=20.19"

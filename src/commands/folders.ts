@@ -1,8 +1,8 @@
 import { mkdir, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 
-import * as p from "@clack/prompts";
 import pc from "../colors.js";
+import * as p from "../prompts.js";
 
 import type { BedrockConfig } from "../config.js";
 

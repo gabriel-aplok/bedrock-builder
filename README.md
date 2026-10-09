@@ -202,7 +202,7 @@ Media codecs are not exported by core. Use the relevant extension instead.
 - **Environment variables.** Only non-secret configuration is read: `NO_COLOR` / `TERM` for color output (`src/colors.ts`), `CI` / `GITHUB_ACTIONS` to disable progress output (`src/commands/create.ts`, `src/commands/pack.ts`), `LOCALAPPDATA` and platform home variables to locate the game folder (`src/paths.ts`), and `BB_PROD` for the production build (`scripts/build.mjs`). No tokens or credentials are read.
 - **Network.** The core package performs no network access. The one exception is `bb init`, which runs `npm view <dep> version` to suggest a current dependency range and falls back to a local default offline (`src/commands/init.ts`).
 - **Install scripts.** `bb ext --install` runs `npm install --ignore-scripts --no-audit --no-fund` inside the extension directory, so extension dependencies cannot run install scripts. The core package itself has no install script.
-- **Dependencies.** Runtime dependencies are `@clack/prompts` (interactive setup), `chokidar` (file watching), and `esbuild` (script bundling). Colors, zip writing, and the build script are implemented in-repo (`src/colors.ts`, `src/pack/zip.ts`, `scripts/build.mjs`) instead of extra packages, i want to avoid future issues, the fmaous guy that wants to make everything from scratch.
+- **Dependencies.** Runtime dependencies are `chokidar` (file watching) and `esbuild` (script bundling). Colors, prompts, zip writing, and the build script are implemented in-repo (`src/colors.ts`, `src/prompts.ts`, `src/pack/zip.ts`, `scripts/build.mjs`) instead of extra packages, i want to avoid future issues, the fmaous guy that wants to make everything from scratch.
 
 ## Documentation
 
