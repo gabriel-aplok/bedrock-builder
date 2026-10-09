@@ -92,4 +92,82 @@ describe("new --from", () => {
       create(fx.config, { type: "item", name: "ruby", from: source }),
     ).rejects.toBeInstanceOf(GenerateError);
   });
+
+  it("imports entity bodies while keeping egg and sidecars", async () => {
+    await setup();
+    const dir = await tempDir();
+    const source = join(dir, "goblin.json");
+    await writeFile(
+      source,
+      JSON.stringify({
+        "minecraft:entity": {
+          description: { identifier: "other:goblin", is_summonable: true },
+        },
+      }),
+    );
+    await create(fx.config, {
+      type: "entity",
+      name: "goblin",
+      mode: "2d",
+      from: source,
+      spawnEgg: true,
+      loot: "entity",
+    });
+
+    const body = JSON.parse(
+      await readFile(join(fx.config.__configDir, "packs", "BP", "entities", "goblin.json"), "utf8"),
+    );
+    expect(body["minecraft:entity"].description.identifier).toBe("test_addon:goblin");
+    expect(body["minecraft:entity"].description.is_summonable).toBe(true);
+    // egg and loot sidecar still wired from the flags.
+    const egg = JSON.parse(
+      await readFile(
+        join(fx.config.__configDir, "packs", "BP", "items", "goblin_spawn_egg.item.json"),
+        "utf8",
+      ),
+    );
+    expect(egg["minecraft:item"].description.identifier).toBe("test_addon:goblin_spawn_egg");
+    const loot = JSON.parse(
+      await readFile(
+        join(fx.config.__configDir, "packs", "BP", "loot_tables", "entities", "goblin.json"),
+        "utf8",
+      ),
+    );
+    expect(loot.pools).toHaveLength(1);
+  });
+
+  it("imports block bodies while keeping recipe sidecars", async () => {
+    await setup();
+    const dir = await tempDir();
+    const source = join(dir, "ore.json");
+    await writeFile(
+      source,
+      JSON.stringify({
+        "minecraft:block": {
+          description: { identifier: "other:ore" },
+          components: { "minecraft:light_emission": 12 },
+        },
+      }),
+    );
+    await create(fx.config, {
+      type: "block",
+      name: "ore",
+      from: source,
+      recipe: "shapeless",
+      ingredients: "minecraft:cobblestone",
+    });
+
+    const body = JSON.parse(
+      await readFile(
+        join(fx.config.__configDir, "packs", "BP", "blocks", "ore.block.json"),
+        "utf8",
+      ),
+    );
+    expect(body["minecraft:block"].description.identifier).toBe("test_addon:ore");
+    expect(body["minecraft:block"].components).toEqual({ "minecraft:light_emission": 12 });
+    const recipe = JSON.parse(
+      await readFile(join(fx.config.__configDir, "packs", "BP", "recipes", "ore.json"), "utf8"),
+    );
+    expect(recipe["minecraft:recipe_shapeless"].description.identifier).toBe("test_addon:ore");
+  });
 });

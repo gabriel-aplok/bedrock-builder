@@ -4,6 +4,7 @@ import { blankArgs, COMMANDS, type CliArgs, type Command } from "./args.js";
 // declare which commands accept them.
 export const VALUE_FLAGS: Record<string, readonly Command[]> = {
   "--name": ["new", "manifest"],
+  "--world": ["run"],
   "--icon": ["new"],
   "--from": ["new"],
   "--geometry": ["new"],
@@ -148,6 +149,7 @@ const VALUE_KEY: Record<string, keyof CliArgs> = {
   "--direction": "direction",
   "--config": "configPath",
   "--output": "output",
+  "--world": "world",
   "--level": "level",
   "--target-version": "targetVersion",
   "--builder": "builder",

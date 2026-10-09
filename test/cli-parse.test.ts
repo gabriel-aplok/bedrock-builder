@@ -134,4 +134,11 @@ describe("parseArgs ,  generator-flag scoping", () => {
     expect(parseArgs(["deploy"]).extraPositionals).toEqual(["deploy"]);
     expect(parseArgs(["create"]).extraPositionals).toEqual(["create"]);
   });
+
+  it("parses run --world as a value flag", () => {
+    const got = parseArgs(["run", "--world", "Survival"]);
+    expect(got.command).toBe("run");
+    expect(got.world).toBe("Survival");
+    expect(got.unknown).toEqual([]);
+  });
 });

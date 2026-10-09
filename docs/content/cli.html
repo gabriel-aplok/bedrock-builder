@@ -133,10 +133,11 @@
   <code>tsc --watch</code>.
 </p>
 <h2>run</h2>
-<pre><code>bb run [--watch] [--release] [--no-types]</code></pre>
+<pre><code>bb run [--watch] [--release] [--no-types] [--world &lt;name&gt;]</code></pre>
 <p>
   Builds, then copies <code>dist/packs/</code> into the game dev pack folders.
   <code>--watch</code> keeps rebuilding on save. <code>--release</code> deploys minified output.
+  <code>--world</code> deploys into a named world folder instead, keyed by pack uuid.
 </p>
 <h2>ship</h2>
 <pre><code>bb ship [--output &lt;path&gt;] [--level 0-9] [--typecheck] [--json]</code></pre>

@@ -43,6 +43,7 @@ export interface CliArgs {
   tag: boolean;
   push: boolean;
   output: string | undefined;
+  world: string | undefined;
   level: string | undefined;
   // init <name> [namespace].
   initName: string | undefined;
@@ -205,6 +206,7 @@ export function blankArgs(): CliArgs {
     tag: false,
     push: false,
     output: undefined,
+    world: undefined,
     level: undefined,
     initName: undefined,
     initNamespace: undefined,

@@ -10,6 +10,7 @@ Build:
 
 Ship:
   run                 Build, then copy into the game packs
+                      --world <name> targets one world folder
   run --watch         Hot reload into the game on save
   ship                Release build plus .mcaddon zip
   publish             Ship, harness, optional bump, tag, push

@@ -197,4 +197,24 @@ describe("deploy command (one-shot)", () => {
       setPlatformForTests(null);
     }
   });
+
+  it("deploys into a named world by pack uuid", async () => {
+    await mkdir(join(box.target, "minecraftWorlds", "TestWorld"), { recursive: true });
+    await deploy(box.config, { release: false, watch: false, world: "testworld" });
+
+    const bpUuid = JSON.parse(
+      await readFile(join(box.config.out, "packs", "BP", "manifest.json"), "utf8"),
+    ).header.uuid;
+    expect(
+      await isFile(
+        join(box.target, "minecraftWorlds", "TestWorld", "behavior_packs", bpUuid, "manifest.json"),
+      ),
+    ).toBe(true);
+  });
+
+  it("fails on an unknown world name", async () => {
+    await expect(
+      deploy(box.config, { release: false, watch: false, world: "Nope" }),
+    ).rejects.toBeInstanceOf(DeployTargetError);
+  });
 });

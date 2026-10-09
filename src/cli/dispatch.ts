@@ -223,6 +223,7 @@ export async function dispatch(args: CliArgs): Promise<number> {
           release: args.release,
           watch: args.watch,
           types: !args.noTypes,
+          world: args.world,
         });
         return 0;
       case "publish":

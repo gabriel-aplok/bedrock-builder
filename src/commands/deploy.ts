@@ -1,21 +1,21 @@
-import { copyFile, mkdir, rm } from "node:fs/promises";
+import { copyFile, mkdir, readdir, readFile, rm } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 
 import { buildBundleWithWatch } from "../bundler.js";
 import type { BedrockConfig } from "../config.js";
 import { logger } from "../logger.js";
-import { resolveDeployTarget, type DeployTargets } from "../paths.js";
+import { DeployTargetError, resolveDeployTarget, type DeployTargets } from "../paths.js";
 import { mapToDest } from "../pipeline/classify.js";
 import { resolveProcessors, runPipelineFile, type FileProcessor } from "../pipeline/index.js";
 import { loadExtensions } from "../pipeline/loader.js";
 import { syncTree } from "../sync.js";
 import { watchTypes } from "../typewatch.js";
 import {
-  createPackWatcher,
-  SaveBatcher,
-  timestamp,
-  waitForReady,
-  type WatchEvent,
+    createPackWatcher,
+    SaveBatcher,
+    timestamp,
+    waitForReady,
+    type WatchEvent,
 } from "../watcher.js";
 import { build } from "./build.js";
 
@@ -23,6 +23,8 @@ export interface DeployOptions {
   release?: boolean;
   watch?: boolean;
   types?: boolean;
+  // deploy into a named world instead of the global dev packs.
+  world?: string | undefined;
   // external stop signal for watch mode. lets hosts stop without signals.
   stop?: AbortSignal | undefined;
 }
@@ -50,6 +52,56 @@ export function startDeployWatch(
   };
 }
 
+async function worldNames(root: string): Promise<string[]> {
+  try {
+    const entries = await readdir(join(root, "minecraftWorlds"), { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+async function packUuid(manifestPath: string): Promise<string | null> {
+  try {
+    const parsed: unknown = JSON.parse(await readFile(manifestPath, "utf8"));
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return null;
+    const header = (parsed as Record<string, unknown>).header;
+    if (typeof header !== "object" || header === null || Array.isArray(header)) return null;
+    const uuid = (header as Record<string, unknown>).uuid;
+    return typeof uuid === "string" && uuid !== "" ? uuid : null;
+  } catch {
+    return null;
+  }
+}
+
+// world packs live under minecraftWorlds/<name>, keyed by pack uuid.
+async function resolveWorldTargets(
+  config: BedrockConfig,
+  root: string,
+  world: string,
+): Promise<DeployTargets> {
+  const names = await worldNames(root);
+  const match = names.find((name) => name.toLowerCase() === world.toLowerCase()) ?? null;
+  if (match === null) {
+    const hint = names.length > 0 ? ` Available: ${names.join(", ")}.` : "";
+    throw new DeployTargetError(`World "${world}" not found under ${root}/minecraftWorlds.${hint}`);
+  }
+  const worldDir = join(root, "minecraftWorlds", match);
+  const bpUuid = await packUuid(join(config.out, "packs", "BP", "manifest.json"));
+  const rpUuid = await packUuid(join(config.out, "packs", "RP", "manifest.json"));
+  if (bpUuid === null || rpUuid === null) {
+    throw new DeployTargetError("Cannot deploy to a world without built pack uuids.");
+  }
+  return {
+    root: worldDir,
+    bp: join(worldDir, "behavior_packs", bpUuid),
+    rp: join(worldDir, "resource_packs", rpUuid),
+  };
+}
+
 function targetPath(targets: DeployTargets, kind: "BP" | "RP", rel: string): string {
   return join(kind === "BP" ? targets.bp : targets.rp, ...rel.split("/"));
 }
@@ -65,7 +117,9 @@ export async function deploy(config: BedrockConfig, options: DeployOptions = {})
   const release = options.release ?? false;
   await build(config, { release, clean: false });
 
-  const targets = await resolveDeployTarget(config);
+  const base = await resolveDeployTarget(config);
+  const world = (options.world ?? "").trim();
+  const targets = world !== "" ? await resolveWorldTargets(config, base.root, world) : base;
   logger.info(`Deploying to ${targets.root}`);
   await pushDist(config, targets);
   logger.success(`Deployed ${config.name} into ${targets.bp} and ${targets.rp}`);
