@@ -6,6 +6,16 @@
   "publisher": "aplok",
   "license": "Zlib",
   "author": "trenbankai",
+  "homepage": "https://bedrock.trenbankai.dev",
+  "keywords": [
+    "minecraft",
+    "bedrock",
+    "mcaddon",
+    "addon"
+  ],
+  "bugs": {
+    "url": "https://github.com/gabriel-aplok/bedrock-builder/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gabriel-aplok/bedrock-builder.git"

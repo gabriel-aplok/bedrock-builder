@@ -12,7 +12,7 @@
     "esbuild",
     "typescript"
   ],
-  "homepage": "https://github.com/gabriel-aplok/bedrock-builder#readme",
+  "homepage": "https://bedrock.trenbankai.dev",
   "bugs": {
     "url": "https://github.com/gabriel-aplok/bedrock-builder/issues"
   },
