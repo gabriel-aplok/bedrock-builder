@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.0
+
 - read pack json tolerantly: comments and trailing commas work in harness, report, validation, and the ide.
 - add a `lang-gap-filler` sample extension that reports missing lang keys and can
   emit completed dist copies without touching sources.

@@ -26,7 +26,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../../../styles.css?v=0.2.0" />
+    <link rel="stylesheet" href="../../../styles.css?v=0.3.0" />
   </head>
   <body data-page="cli">
     <header class="nav">
@@ -381,9 +381,10 @@
   is found. Regenerate after adding worlds.
 </p>
 <h2>version</h2>
-<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb version &lt;semver&gt; [--dry-run] [--json]</code></pre></div>
+<div class="codeblock"><div class="codeblock-bar"><span></span><span></span><span></span><button class="copy-btn" type="button" aria-label="Copy code"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"/></svg></button></div><pre><code>bb version [&lt;semver&gt;] [--dry-run] [--json]</code></pre></div>
 <p>
-  Writes one version to the config plus both manifests.
+  With no argument prints the current project version from the config. With a version writes it to
+  the config plus both manifests.
   <code>--dry-run</code> previews without writing.
 </p>
 <h2>update</h2>
@@ -480,7 +481,7 @@
   </div>
 </footer>
 
-    <script src="../../../site.js?v=0.2.0"></script>
+    <script src="../../../site.js?v=0.3.0"></script>
     <script>
       document.querySelectorAll(".sidebar a[data-page]").forEach((a) => {
         if (a.getAttribute("data-page") === document.body.dataset.page) a.classList.add("active");

@@ -2,7 +2,7 @@
   "name": "bedrock-vscode",
   "displayName": "Bedrock Builder",
   "description": "Complete addon dev environment for Minecraft Bedrock.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "gabriel-aplok",
   "license": "Zlib",
   "icon": "images/icon.png",

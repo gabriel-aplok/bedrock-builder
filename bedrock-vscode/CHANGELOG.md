@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.0
+
 - heal downloaded schemas: drop the relative `$id` that broke sibling `$ref` resolution, so json validation works in VSCodium.
 - activate the extension on json and jsonc files, so schemas, coloring, and linting load on open.
 - ship the esbuild build binaries for Windows and Linux in one vsix, so build, run, and watch work on both.

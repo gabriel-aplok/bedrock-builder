@@ -26,7 +26,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../../../styles.css?v=0.2.0" />
+    <link rel="stylesheet" href="../../../styles.css?v=0.3.0" />
   </head>
   <body data-page="release-publish">
     <header class="nav">
@@ -168,7 +168,9 @@
     <code>major</code>, or <code>x.y.z</code>. Writes to config plus both manifests.
   </li>
   <li>Ship a release build into <code>dist/&lt;name&gt;-&lt;version&gt;.mcaddon</code>.</li>
-  <li>Run <code>bb harness</code> on the ship output. Any finding stops the release with exit code 12.</li>
+  <li>
+    Run <code>bb harness</code> on the ship output. Any finding stops the release with exit code 12.
+  </li>
   <li>
     Tag <code>v&lt;version&gt;</code> when <code>--tag</code> is set. Fails when git tag fails.
   </li>
@@ -252,7 +254,7 @@
   </div>
 </footer>
 
-    <script src="../../../site.js?v=0.2.0"></script>
+    <script src="../../../site.js?v=0.3.0"></script>
     <script>
       document.querySelectorAll(".sidebar a[data-page]").forEach((a) => {
         if (a.getAttribute("data-page") === document.body.dataset.page) a.classList.add("active");
