@@ -1,0 +1,6 @@
+{
+  "name": "json-obfuscator",
+  "version": "1.0.0",
+  "description": "escape json strings as unicode so packs read harder",
+  "entry": "index.mjs"
+}

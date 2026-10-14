@@ -1,0 +1,77 @@
+<h1>Changelog</h1>
+<p>Release history for Bedrock Builder.</p>
+<h2>Unreleased</h2>
+<ul>
+  <li>Add a <code>json-obfuscator</code> sample extension that escapes json strings as unicode.</li>
+  <li>Add an <code>emit</code> pipeline hook so extensions can generate sourceless files.</li>
+  <li>Mirror remapped file paths in watch mode instead of source paths.</li>
+  <li>Fix <code>bb diff</code> reporting remapped files as modified after a no-op build.</li>
+  <li>
+    Quote windows tool paths with spaces, fixing <code>bb brarchive</code> and installs under such
+    paths.
+  </li>
+  <li>Derive the builder version range from the package itself instead of stale constants.</li>
+  <li>
+    Rewrite nested <code>description</code> identifiers into the project namespace on
+    <code>bb new --from</code>.
+  </li>
+  <li>Check the VS Code extension in CI with typecheck, build, and vsix packaging.</li>
+  <li>Document the VS Code extension under guides.</li>
+  <li>
+    Import resource pack bodies with <code>bb new &lt;type&gt; --from &lt;file&gt;</code>, not just
+    behavior pack ones.
+  </li>
+  <li>Complete <code>--world</code> values from installed worlds in <code>bb completion</code>.</li>
+  <li>Pick the run world and server folder from the VS Code command palette.</li>
+</ul>
+<h2>0.2.0</h2>
+<ul>
+  <li>
+    Replace <code>picocolors</code>, <code>tsup</code>, <code>archiver</code>, and
+    <code>@clack/prompts</code> with in-repo implementations.
+  </li>
+  <li>Fix cache pruning deleting the bundler output directory during parallel builds.</li>
+  <li>Run <code>git</code> and <code>npm</code> through argument arrays, not shell strings.</li>
+  <li>Run checks on Ubuntu and Windows.</li>
+  <li>
+    Add <code>bb init &lt;name&gt; [namespace]</code> and
+    <code>bb init --builder &lt;path&gt;</code>.
+  </li>
+  <li>Check atlas texture files and png sizes in <code>bb harness --strict</code>.</li>
+  <li>
+    Check entry <code>@minecraft/*</code> imports and server version drift in <code>bb check</code>.
+  </li>
+  <li>Check manifest UUIDs, engine version, and the RP to BP link on <code>bb ship</code>.</li>
+  <li>
+    Accept manifest versions as <code>1.0.0</code> or <code>[1, 0, 0]</code> everywhere, and reject
+    malformed strings.
+  </li>
+  <li>
+    Import behavior bodies from existing files with
+    <code>bb new &lt;type&gt; --from &lt;file&gt;</code>.
+  </li>
+  <li>
+    Update declared deps, reinstall, and sync the manifest server version with
+    <code>bb update</code>.
+  </li>
+  <li>Print shell completions with <code>bb completion [bash|zsh|powershell]</code>.</li>
+  <li>Adopt existing pack folders with <code>bb import [dir]</code>.</li>
+  <li>Deploy into a named world with <code>bb run --world &lt;name&gt;</code>.</li>
+  <li>Compile server-optimized packs with <code>bb brarchive</code> (windows only).</li>
+  <li>Deploy to Preview and Store Beta installs with a <code>preview</code> target.</li>
+  <li>
+    Add a <code>loot_table</code> generator plus <code>spawn-egg</code>, recipe <code>unlock</code>,
+    and trade <code>max-uses</code>/<code>xp</code> options.
+  </li>
+</ul>
+<h2>0.1.0 - first release</h2>
+<ul>
+  <li>
+    Create projects with <code>bb init</code> and generate resources with <code>bb new</code>.
+  </li>
+  <li>Bundle scripts, copy both packs, deploy locally, and watch for changes.</li>
+  <li>Validate projects with <code>bb check</code> and <code>bb harness</code>.</li>
+  <li>Create release builds and <code>.mcaddon</code> files with <code>bb ship</code>.</li>
+  <li>Support project-enabled extensions and JSON output for scripts and CI.</li>
+  <li>Provide a JavaScript and TypeScript API.</li>
+</ul>

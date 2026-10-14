@@ -1,0 +1,136 @@
+{
+  "Behavior entity": {
+    "prefix": "bp-entity",
+    "body": [
+      "{",
+      "\t\"format_version\": \"1.21.0\",",
+      "\t\"minecraft:entity\": {",
+      "\t\t\"description\": {",
+      "\t\t\t\"identifier\": \"${1:namespace:name}\",",
+      "\t\t\t\"is_spawnable\": ${2:true},",
+      "\t\t\t\"is_summonable\": ${3:true}",
+      "\t\t},",
+      "\t\t\"components\": {",
+      "\t\t\t$0",
+      "\t\t},",
+      "\t\t\"events\": {}",
+      "\t}",
+      "}"
+    ],
+    "description": "Behavior pack entity shell"
+  },
+  "Client entity": {
+    "prefix": "rp-entity",
+    "body": [
+      "{",
+      "\t\"format_version\": \"1.10.0\",",
+      "\t\"minecraft:client_entity\": {",
+      "\t\t\"description\": {",
+      "\t\t\t\"identifier\": \"${1:namespace:name}\",",
+      "\t\t\t\"spawn_egg\": {",
+      "\t\t\t\t\"base_color\": \"${2:#a0a0a0}\",",
+      "\t\t\t\t\"overlay_color\": \"${3:#505050}\"$0",
+      "\t\t\t}",
+      "\t\t}",
+      "\t}",
+      "}"
+    ],
+    "description": "Resource pack client entity with spawn egg"
+  },
+  "Shapeless recipe": {
+    "prefix": "recipe-shapeless",
+    "body": [
+      "{",
+      "\t\"format_version\": \"1.21.0\",",
+      "\t\"minecraft:recipe_shapeless\": {",
+      "\t\t\"description\": { \"identifier\": \"${1:namespace:recipe}\" },",
+      "\t\t\"tags\": [\"crafting_table\"],",
+      "\t\t\"ingredients\": [{ \"item\": \"${2:namespace:item}\" }],",
+      "\t\t\"result\": { \"item\": \"${3:namespace:item}\"${4:, \"count\": 1} }$0",
+      "\t}",
+      "}"
+    ],
+    "description": "Shapeless crafting recipe"
+  },
+  "Loot table": {
+    "prefix": "loot-table",
+    "body": [
+      "{",
+      "\t\"pools\": [",
+      "\t\t{",
+      "\t\t\t\"rolls\": 1,",
+      "\t\t\t\"entries\": [{ \"type\": \"item\", \"name\": \"${1:namespace:item}\", \"weight\": ${2:1} }]",
+      "\t\t}$0",
+      "\t]",
+      "}"
+    ],
+    "description": "Loot table with one pool"
+  },
+  "Animation controller": {
+    "prefix": "animation-controller",
+    "body": [
+      "{",
+      "\t\"format_version\": \"1.10.0\",",
+      "\t\"animation_controllers\": {",
+      "\t\t\"controller.animation.${1:namespace:name}\": {",
+      "\t\t\t\"initial_state\": \"default\",",
+      "\t\t\t\"states\": {",
+      "\t\t\t\t\"default\": {",
+      "\t\t\t\t\t\"animations\": [\"${2:idle}\"],",
+      "\t\t\t\t\t\"transitions\": [{ \"${3:other}\": \"${4:query.condition}\" }],",
+      "\t\t\t\t\t\"on_entry\": [\"variable.${5:flag} = 0;\"]$0",
+      "\t\t\t\t}",
+      "\t\t\t}",
+      "\t\t}",
+      "\t}",
+      "}"
+    ],
+    "description": "Animation controller with one state"
+  },
+  "Spawn rules": {
+    "prefix": "spawn-rules",
+    "body": [
+      "{",
+      "\t\"format_version\": \"1.8.0\",",
+      "\t\"minecraft:spawn_rules\": {",
+      "\t\t\"description\": {",
+      "\t\t\t\"identifier\": \"${1:namespace:name}\",",
+      "\t\t\t\"population_control\": \"${2:animal}\"",
+      "\t\t},",
+      "\t\t\"conditions\": [",
+      "\t\t\t{",
+      "\t\t\t\t\"minecraft:spawns_on_surface\": {},",
+      "\t\t\t\t\"minecraft:brightness_filter\": { \"min\": 7, \"max\": 15, \"adjust_for_weather\": true },",
+      "\t\t\t\t\"minecraft:difficulty_filter\": { \"min\": \"easy\", \"max\": \"hard\" },",
+      "\t\t\t\t\"minecraft:weight\": { \"default\": ${3:100} },",
+      "\t\t\t\t\"minecraft:herd\": { \"min_size\": ${4:2}, \"max_size\": ${5:4} },",
+      "\t\t\t\t\"minecraft:biome_filter\": { \"test\": \"has_biome_tag\", \"operator\": \"==\", \"value\": \"${6:monster}\" }$0",
+      "\t\t\t}",
+      "\t\t]",
+      "\t}",
+      "}"
+    ],
+    "description": "Spawn rules with surface conditions"
+  },
+  "Dialogue scene": {
+    "prefix": "dialogue-scene",
+    "body": [
+      "{",
+      "\t\"format_version\": \"1.17.0\",",
+      "\t\"minecraft:npc_dialogue\": {",
+      "\t\t\"scenes\": [",
+      "\t\t\t{",
+      "\t\t\t\t\"scene_tag\": \"${1:main}\",",
+      "\t\t\t\t\"npc_name\": \"${2:Guide}\",",
+      "\t\t\t\t\"text\": \"${3:Hello, traveler.}\",",
+      "\t\t\t\t\"buttons\": [",
+      "\t\t\t\t\t{ \"name\": \"${4:Farewell}\", \"commands\": [\"${5:/say bye}\"] }$0",
+      "\t\t\t\t]",
+      "\t\t\t}",
+      "\t\t]",
+      "\t}",
+      "}"
+    ],
+    "description": "NPC dialogue scene with one button"
+  }
+}

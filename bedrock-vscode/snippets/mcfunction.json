@@ -1,0 +1,63 @@
+{
+  "Execute as self": {
+    "prefix": "execute-as",
+    "body": ["execute as ${1:@s} at ${1:@s} run ${0}"],
+    "description": "Execute a command on behalf of a target"
+  },
+  "Execute if entity": {
+    "prefix": "execute-if",
+    "body": ["execute as ${1:@s} at ${1:@s} if entity ${2:@e[type=${3:mob}]} run ${0}"],
+    "description": "Run a command when an entity matches"
+  },
+  "Give item": {
+    "prefix": "give",
+    "body": ["give ${1:@s} ${2:namespace:item} ${3:1}$0"],
+    "description": "Give an item to a target"
+  },
+  "Summon entity": {
+    "prefix": "summon",
+    "body": ["summon ${1:namespace:entity} ${2:~ ~1 ~}$0"],
+    "description": "Summon an entity with optional position"
+  },
+  "Tellraw message": {
+    "prefix": "tellraw",
+    "body": ["tellraw ${1:@a} {\"rawtext\":[{\"text\":\"${0:message}\"}]}"],
+    "description": "Send a JSON text message"
+  },
+  "Tag add": {
+    "prefix": "tag-add",
+    "body": ["tag ${1:@s} add ${0:tag}"],
+    "description": "Add a scoreboard tag to a target"
+  },
+  "Kill filtered": {
+    "prefix": "kill-filtered",
+    "body": ["kill ${1:@e[type=${2:namespace:entity}]}$0"],
+    "description": "Kill entities matching a selector"
+  },
+  "Run function": {
+    "prefix": "function",
+    "body": ["function ${0:path/to/function}"],
+    "description": "Run a function file"
+  },
+  "Titleraw fade": {
+    "prefix": "titleraw-fade",
+    "body": [
+      "titleraw ${1:@s} times ${2:10} ${3:40} ${4:10}",
+      "titleraw ${1:@s} title {\"rawtext\":[{\"text\":\"${0:message}\"}]}"
+    ],
+    "description": "Show a title with fade times"
+  },
+  "Scoreboard setup": {
+    "prefix": "scoreboard-setup",
+    "body": [
+      "scoreboard objectives add ${1:name} dummy ${2:display name}",
+      "scoreboard objectives setdisplay sidebar ${1:name}$0"
+    ],
+    "description": "Create an objective and show it in the sidebar"
+  },
+  "Structure load": {
+    "prefix": "structure-load",
+    "body": ["structure load ${1:name} ${2:~ ~ ~}$0"],
+    "description": "Load a structure at a position"
+  }
+}

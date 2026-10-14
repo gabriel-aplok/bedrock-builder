@@ -1,0 +1,28 @@
+<h1>Custom Deploy Path</h1>
+<p>
+  When the retail auto detect misses the Minecraft install, point
+  <code>bb</code> at the data folder directly.
+</p>
+<h2>Config</h2>
+<pre><code>{
+  "bb": {
+    "deploy": { "target": "custom", "customPath": "C:/Games/com.mojang" }
+  }
+}</code></pre>
+<p>
+  Set <code>deploy.target</code> to <code>custom</code> and <code>deploy.customPath</code> to the
+  folder that holds <code>development_behavior_packs/</code>. Relative paths resolve from the config
+  folder. Absolute paths work as written.
+</p>
+<h2>Verify</h2>
+<pre><code>bb check</code></pre>
+<p>
+  <code>bb check</code> reports the resolved deploy target. A missing folder fails the check with a
+  fix hint instead of failing mid run.
+</p>
+<h2>Use cases</h2>
+<ul>
+  <li>Portable or nonstandard installs that live outside the known folders.</li>
+  <li>Secondary profiles with their own <code>com.mojang</code> data dir.</li>
+  <li>CI machines that stage a fake data dir for deploy dry runs.</li>
+</ul>

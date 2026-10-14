@@ -1,0 +1,250 @@
+import { copyFile, mkdir, readdir, readFile, rm } from "node:fs/promises";
+import { dirname, join, relative } from "node:path";
+
+import { buildBundleWithWatch } from "../bundler.js";
+import type { BedrockConfig } from "../config.js";
+import { logger } from "../logger.js";
+import { DeployTargetError, resolveDeployTarget, type DeployTargets } from "../paths.js";
+import { mapRemapped } from "../pipeline/classify.js";
+import { resolveProcessors, runPipelineFile, type FileProcessor } from "../pipeline/index.js";
+import { loadExtensions } from "../pipeline/loader.js";
+import { syncTree } from "../sync.js";
+import { watchTypes } from "../typewatch.js";
+import {
+  createPackWatcher,
+  SaveBatcher,
+  timestamp,
+  waitForReady,
+  type WatchEvent,
+} from "../watcher.js";
+import { build } from "./build.js";
+
+export interface DeployOptions {
+  release?: boolean;
+  watch?: boolean;
+  types?: boolean;
+  // deploy into a named world instead of the global dev packs.
+  world?: string | undefined;
+  // external stop signal; lets hosts stop without a process signal.
+  stop?: AbortSignal | undefined;
+}
+
+export interface DeploySession {
+  done: Promise<void>;
+  stop(): void;
+}
+
+export function startDeployWatch(
+  config: BedrockConfig,
+  options: Omit<DeployOptions, "watch"> = {},
+): DeploySession {
+  const stopper = new AbortController();
+  const done = deploy(config, {
+    ...options,
+    watch: true,
+    stop: stopper.signal,
+  });
+  return {
+    done,
+    stop() {
+      stopper.abort();
+    },
+  };
+}
+
+// world names under the deploy target; empty without a game install.
+export async function listWorlds(config: BedrockConfig): Promise<string[]> {
+  try {
+    const targets = await resolveDeployTarget(config);
+    return await worldNames(targets.root);
+  } catch {
+    return [];
+  }
+}
+
+async function worldNames(root: string): Promise<string[]> {
+  try {
+    const entries = await readdir(join(root, "minecraftWorlds"), { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+async function packUuid(manifestPath: string): Promise<string | null> {
+  try {
+    const parsed: unknown = JSON.parse(await readFile(manifestPath, "utf8"));
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return null;
+    const header = (parsed as Record<string, unknown>).header;
+    if (typeof header !== "object" || header === null || Array.isArray(header)) return null;
+    const uuid = (header as Record<string, unknown>).uuid;
+    return typeof uuid === "string" && uuid !== "" ? uuid : null;
+  } catch {
+    return null;
+  }
+}
+
+// world packs live under minecraftWorlds/<name>, keyed by pack uuid.
+async function resolveWorldTargets(
+  config: BedrockConfig,
+  root: string,
+  world: string,
+): Promise<DeployTargets> {
+  const names = await worldNames(root);
+  const match = names.find((name) => name.toLowerCase() === world.toLowerCase()) ?? null;
+  if (match === null) {
+    const hint = names.length > 0 ? ` Available: ${names.join(", ")}.` : "";
+    throw new DeployTargetError(`World "${world}" not found under ${root}/minecraftWorlds.${hint}`);
+  }
+  const worldDir = join(root, "minecraftWorlds", match);
+  const bpUuid = await packUuid(join(config.out, "packs", "BP", "manifest.json"));
+  const rpUuid = await packUuid(join(config.out, "packs", "RP", "manifest.json"));
+  if (bpUuid === null || rpUuid === null) {
+    throw new DeployTargetError("Cannot deploy to a world without built pack uuids.");
+  }
+  return {
+    root: worldDir,
+    bp: join(worldDir, "behavior_packs", bpUuid),
+    rp: join(worldDir, "resource_packs", rpUuid),
+  };
+}
+
+function targetPath(targets: DeployTargets, kind: "BP" | "RP", rel: string): string {
+  return join(kind === "BP" ? targets.bp : targets.rp, ...rel.split("/"));
+}
+
+async function pushDist(config: BedrockConfig, targets: DeployTargets): Promise<void> {
+  await Promise.all([
+    syncTree(join(config.out, "packs", "BP"), targets.bp),
+    syncTree(join(config.out, "packs", "RP"), targets.rp),
+  ]);
+}
+
+export async function deploy(config: BedrockConfig, options: DeployOptions = {}): Promise<void> {
+  const release = options.release ?? false;
+  await build(config, { release, clean: false });
+
+  const base = await resolveDeployTarget(config);
+  const world = (options.world ?? "").trim();
+  const targets = world !== "" ? await resolveWorldTargets(config, base.root, world) : base;
+  logger.info(`Deploying to ${targets.root}`);
+  await pushDist(config, targets);
+  logger.success(`Deployed ${config.name} into ${targets.bp} and ${targets.rp}`);
+
+  if (!(options.watch ?? false)) return;
+  logger.info(
+    `Watching ${config.packs.bp} and ${config.packs.rp} for changes (run --watch${release ? " --release" : ""})...`,
+  );
+  await loadExtensions(config);
+  const chain = resolveProcessors(config);
+  const types = (options.types ?? true) ? watchTypes(config.__configDir) : null;
+
+  const bundler = await buildBundleWithWatch(config, { release }, async (result) => {
+    try {
+      const main = join(targets.bp, "scripts", "main.js");
+      await mkdir(dirname(main), { recursive: true });
+      await copyFile(result.outputPath, main);
+      logger.success(`[${timestamp()}] Rebuilt + deployed scripts in ${result.elapsedMs}ms`);
+    } catch (err) {
+      logger.warn(`failed to deploy bundle: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  });
+
+  const watcher = await createPackWatcher(config);
+  const batch = new SaveBatcher((files) => {
+    void deploySavedFiles(config, targets, files, release, chain);
+  });
+  watcher.on("add", (file: string) => batch.push(file, "add"));
+  watcher.on("change", (file: string) => batch.push(file, "change"));
+  watcher.on("unlink", (file: string) => void dropTarget(config, targets, file, chain));
+  watcher.on("error", (err: unknown) => {
+    logger.warn(`watcher error: ${err instanceof Error ? err.message : String(err)}`);
+  });
+  await waitForReady(watcher);
+
+  logger.info("Press Ctrl+C to stop.");
+  await waitForSignal(options.stop);
+
+  logger.info("Shutting down watcher...");
+  types?.stop();
+  await bundler.dispose().catch((err: unknown) => {
+    logger.warn(`bundler dispose: ${err instanceof Error ? err.message : String(err)}`);
+  });
+  await watcher.close().catch((err: unknown) => {
+    logger.warn(`watcher close: ${err instanceof Error ? err.message : String(err)}`);
+  });
+}
+
+async function deploySavedFiles(
+  config: BedrockConfig,
+  targets: DeployTargets,
+  files: Map<string, WatchEvent>,
+  release: boolean,
+  chain: readonly FileProcessor[],
+): Promise<void> {
+  let done = 0;
+  for (const [file, event] of files) {
+    const rel = relative(config.__configDir, file);
+    logger.debug(`watch ${event}: ${rel}`);
+    try {
+      if (!(await runPipelineFile(config, file, { release }, chain))) {
+        logger.debug(`watch skipped: ${rel}`);
+        continue;
+      }
+      const mapped = mapRemapped(config, chain, file);
+      if (!mapped) {
+        logger.debug(`watch unmapped: ${rel}`);
+        continue;
+      }
+      const dest = targetPath(targets, mapped.kind, mapped.rel);
+      await mkdir(dirname(dest), { recursive: true });
+      await copyFile(mapped.dst, dest);
+      done++;
+      logger.debug(`watch deployed: ${rel}`);
+    } catch (err) {
+      logger.warn(`failed to mirror ${file}: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  if (done === 0) return;
+  const [first, ...rest] = [...files.keys()].map((file) => relative(config.__configDir, file));
+  const extra = rest.length > 0 ? ` (+${rest.length} more)` : "";
+  logger.success(
+    `[${timestamp()}] deployed ${done} file${done === 1 ? "" : "s"}: ${first}${extra} into target`,
+  );
+}
+
+async function dropTarget(
+  config: BedrockConfig,
+  targets: DeployTargets,
+  file: string,
+  chain: readonly FileProcessor[],
+): Promise<void> {
+  try {
+    const mapped = mapRemapped(config, chain, file);
+    if (!mapped) return;
+    await rm(targetPath(targets, mapped.kind, mapped.rel), { force: true });
+    logger.success(`[${timestamp()}] removed ${relative(config.__configDir, file)} from target`);
+  } catch (err) {
+    logger.warn(
+      `failed to remove mirror for ${file}: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+}
+
+function waitForSignal(stop?: AbortSignal): Promise<void> {
+  if (stop?.aborted) return Promise.resolve();
+  return new Promise<void>((wake) => {
+    const done = () => {
+      stop?.removeEventListener("abort", done);
+      process.off("SIGINT", done);
+      process.off("SIGTERM", done);
+      wake();
+    };
+    stop?.addEventListener("abort", done, { once: true });
+    process.once("SIGINT", done);
+    process.once("SIGTERM", done);
+  });
+}

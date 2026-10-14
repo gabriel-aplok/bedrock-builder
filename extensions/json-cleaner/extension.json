@@ -1,0 +1,6 @@
+{
+  "name": "json-cleaner",
+  "version": "1.0.0",
+  "description": "strip JSON comments and optional root $schema fields",
+  "entry": "index.mjs"
+}

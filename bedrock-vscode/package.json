@@ -1,0 +1,252 @@
+{
+  "name": "bedrock-vscode",
+  "displayName": "Bedrock Builder",
+  "description": "Complete addon dev environment for Minecraft Bedrock.",
+  "version": "0.2.0",
+  "publisher": "gabriel-aplok",
+  "license": "Zlib",
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#0b0b0b",
+    "theme": "dark"
+  },
+  "author": "trenbankai",
+  "homepage": "https://bedrock.trenbankai.dev",
+  "keywords": [
+    "minecraft",
+    "bedrock",
+    "mcaddon",
+    "mcfunction",
+    "molang",
+    "lang",
+    "snippets",
+    "addon"
+  ],
+  "bugs": {
+    "url": "https://github.com/gabriel-aplok/bedrock-builder/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabriel-aplok/bedrock-builder.git"
+  },
+  "type": "module",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "main": "./dist/extension.mjs",
+  "activationEvents": [
+    "onStartupFinished",
+    "onLanguage:json",
+    "onLanguage:jsonc"
+  ],
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/extension.mjs --external:vscode --log-level=warning",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "prevsix": "node ../scripts/build-ext-icon.mjs",
+    "vscode:prepublish": "npm run build",
+    "vsix": "npx --yes @vscode/vsce package"
+  },
+  "devDependencies": {
+    "@aplok/bedrock-builder": "file:..",
+    "@types/node": "^26.6.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.0"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "mcfunction",
+        "aliases": [
+          "mcfunction"
+        ],
+        "extensions": [
+          ".mcfunction"
+        ]
+      },
+      {
+        "id": "bedrock-lang",
+        "aliases": [
+          "Bedrock Lang"
+        ],
+        "extensions": [
+          ".lang"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "bedrock-lang",
+        "scopeName": "source.bedrock-lang",
+        "path": "./syntaxes/lang.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "mcfunction",
+        "path": "./snippets/mcfunction.json"
+      },
+      {
+        "language": "json",
+        "path": "./snippets/bedrock-json.json"
+      },
+      {
+        "language": "jsonc",
+        "path": "./snippets/bedrock-json.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "bedrock.build",
+        "title": "Bedrock: Build"
+      },
+      {
+        "command": "bedrock.run",
+        "title": "Bedrock: Run in game"
+      },
+      {
+        "command": "bedrock.world.select",
+        "title": "Bedrock: Select run world"
+      },
+      {
+        "command": "bedrock.update",
+        "title": "Bedrock: Update dependencies"
+      },
+      {
+        "command": "bedrock.ship",
+        "title": "Bedrock: Ship .mcaddon"
+      },
+      {
+        "command": "bedrock.brarchive",
+        "title": "Bedrock: Compile brarchive pack"
+      },
+      {
+        "command": "bedrock.serverDir.select",
+        "title": "Bedrock: Select server folder"
+      },
+      {
+        "command": "bedrock.check",
+        "title": "Bedrock: Check project"
+      },
+      {
+        "command": "bedrock.clean",
+        "title": "Bedrock: Clean output"
+      },
+      {
+        "command": "bedrock.new",
+        "title": "Bedrock: New feature"
+      },
+      {
+        "command": "bedrock.completions.refresh",
+        "title": "Bedrock: Refresh completions"
+      },
+      {
+        "command": "bedrock.diff",
+        "title": "Bedrock: Show changed files"
+      },
+      {
+        "command": "bedrock.manifest",
+        "title": "Bedrock: Rewrite manifests"
+      },
+      {
+        "command": "bedrock.version",
+        "title": "Bedrock: Bump version"
+      },
+      {
+        "command": "bedrock.publish",
+        "title": "Bedrock: Publish release"
+      },
+      {
+        "command": "bedrock.import",
+        "title": "Bedrock: Import pack folder"
+      },
+      {
+        "command": "bedrock.init",
+        "title": "Bedrock: New project"
+      },
+      {
+        "command": "bedrock.schema.select",
+        "title": "Bedrock: Select schema version"
+      },
+      {
+        "command": "bedrock.schema.refresh",
+        "title": "Bedrock: Refresh schemas"
+      },
+      {
+        "command": "bedrock.scripts.check",
+        "title": "Bedrock: Check scripts"
+      },
+      {
+        "command": "bedrock.harness",
+        "title": "Bedrock: Test content links"
+      },
+      {
+        "command": "bedrock.report",
+        "title": "Bedrock: Pack report"
+      },
+      {
+        "command": "bedrock.watch.start",
+        "title": "Bedrock: Start watch deploy"
+      },
+      {
+        "command": "bedrock.watch.stop",
+        "title": "Bedrock: Stop watch deploy"
+      }
+    ],
+    "configuration": {
+      "title": "Bedrock",
+      "properties": {
+        "bedrock.configPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to config.json, relative to the workspace folder. Empty means auto detect."
+        },
+        "bedrock.schema.version": {
+          "type": "string",
+          "default": "latest",
+          "description": "Mojang bedrock-schemas version: latest, beta, or an exact version."
+        },
+        "bedrock.schema.auto": {
+          "type": "boolean",
+          "default": true,
+          "description": "Download schemas and wire JSON validation on startup."
+        },
+        "bedrock.script.check": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check script entry and server types on startup."
+        },
+        "bedrock.minecraftColors.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Colorize Minecraft § codes in the editor."
+        },
+        "bedrock.verbose": {
+          "type": "boolean",
+          "default": false,
+          "description": "Verbose builder logging."
+        },
+        "bedrock.harness.strict": {
+          "type": "boolean",
+          "default": false,
+          "description": "Strict harness: unused lang keys and missing icons fail."
+        },
+        "bedrock.run.world": {
+          "type": "string",
+          "default": "",
+          "description": "Deploy into a named world folder. Empty means the dev packs."
+        },
+        "bedrock.brarchive.serverDir": {
+          "type": "string",
+          "default": "",
+          "description": "Folder with bedrock_server.exe. Empty means config, env, then ./bedrock_server."
+        }
+      }
+    }
+  }
+}

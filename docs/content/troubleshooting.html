@@ -1,0 +1,54 @@
+<h1>Troubleshooting</h1>
+<p>Five issues cover most failures. Each lists the symptom, the cause, and the fix.</p>
+<h2>Deploy target missing</h2>
+<p>
+  <code>bb run</code> exits with code 3 and lists every path it checked. No
+  <code>com.mojang</code> exists under any known install.
+</p>
+<pre><code>bb check</code></pre>
+<p>
+  Use the check output to see the resolved target. When auto detect misses, set a custom path. See
+  <a href="{{DOCS}}guides/custom-deploy/">Custom Deploy Path</a>.
+</p>
+<h2>UUID collisions</h2>
+<p>
+  Two packs share a <code>header.uuid</code>. The game loads one and ignores the other, or imports
+  fail. This happens after copying a project folder by hand.
+</p>
+<pre><code>bb manifest --dry-run
+bb manifest</code></pre>
+<p>
+  <code>bb manifest</code> rewrites both manifests with fresh UUIDs and cross-links the RP
+  dependency to the BP uuid. <code>bb init</code> already generates fresh UUIDs per create, so new
+  projects never collide.
+</p>
+<h2>Entry not found</h2>
+<p>
+  Build fails with <code>entry missing</code> and names the expected path. The file was moved,
+  renamed, or never created.
+</p>
+<pre><code>bb check --fix</code></pre>
+<p>
+  Fix mode creates the missing entry as a stub. When the entry lives elsewhere, set
+  <code>bb.entry</code> in <code>config.json</code> to the real path instead.
+</p>
+<h2>ffmpeg missing</h2>
+<p>
+  <code>bb check</code> reports an extension tool as missing when that extension is enabled. Audio
+  files copy through without conversion. OGG output needs the binary.
+</p>
+<p>
+  Install ffmpeg and ensure it sits on PATH, then rerun <code>bb check</code>. The check stays green
+  without it, since audio copy is a fallback, not a failure.
+</p>
+<h2>Config drift</h2>
+<p>
+  Version in <code>config.json</code> differs from one or both manifests. The game shows a stale
+  version, or ship names the zip wrong.
+</p>
+<pre><code>bb version 1.1.0</code></pre>
+<p>
+  <code>bb version</code> writes one version to the config plus both manifests. Run it after any
+  manual manifest edit. <code>bb ship</code> validates manifests before zipping and stops on
+  mismatch with exit code 4.
+</p>

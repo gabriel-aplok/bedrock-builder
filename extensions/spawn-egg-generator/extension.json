@@ -1,0 +1,6 @@
+{
+  "name": "spawn-egg-generator",
+  "version": "1.0.0",
+  "description": "emit rp client entities with spawn eggs for bp entities missing them",
+  "entry": "index.mjs"
+}

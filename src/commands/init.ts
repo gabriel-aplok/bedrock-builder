@@ -1,0 +1,310 @@
+import { runTool } from "../process.js";
+import { mkdir, readdir, writeFile } from "node:fs/promises";
+import { isAbsolute, join, relative, resolve } from "node:path";
+
+import pc from "../colors.js";
+import { logger, printJson } from "../logger.js";
+import * as p from "../prompts.js";
+import { AbortError } from "./create-prompts.js";
+import { buildInitFiles } from "./init-files.js";
+import { deriveNamespace, validateNamespace } from "../generate/core/identifier.js";
+import { packageVersion } from "../package-info.js";
+
+export interface InitOptions {
+  // where to create. Defaults to ./<name>.
+  dir?: string | undefined;
+  // create into the current directory instead of a subdir.
+  here?: boolean | undefined;
+  // overwrite an existing non-empty directory.
+  force?: boolean | undefined;
+  // emit src/main.js instead of src/main.ts.
+  js?: boolean | undefined;
+  // run git init after creating. skips the prompt when set.
+  git?: boolean | undefined;
+  gitSet?: boolean | undefined;
+  // run npm install after creating. skips the prompt when set.
+  install?: boolean | undefined;
+  installSet?: boolean | undefined;
+  targetVersion?: string | undefined;
+  json?: boolean | undefined;
+  // identifier namespace used for generated content ids.
+  namespace?: string | undefined;
+  // local builder package (tgz or dir) instead of the npm release.
+  builder?: string | undefined;
+}
+
+export interface InitReport {
+  command: "init";
+  ok: boolean;
+  dir: string;
+  files: string[];
+  git: boolean;
+  installed: boolean;
+}
+
+export class InitError extends Error {
+  readonly exitCode = 8;
+  constructor(message: string) {
+    super(message);
+    this.name = "InitError";
+  }
+}
+
+const NAME = /^[a-z0-9][a-z0-9_-]*$/;
+const VERSION = /^\d+\.\d+\.\d+$/;
+
+function parseName(raw: string): string {
+  const name = raw.trim();
+  if (name === "") {
+    throw new InitError("A project name is required. Usage: bb init <name>");
+  }
+  if (!NAME.test(name)) {
+    throw new InitError(
+      `Project name must be lowercase letters, digits, dash, or underscore, got "${raw}".`,
+    );
+  }
+  return name;
+}
+
+function parseVersion(raw: string | undefined, fallback: string): string {
+  const value = (raw ?? fallback).trim();
+  if (!VERSION.test(value)) {
+    throw new InitError(`Version must be x.y.z, got "${value}".`);
+  }
+  return value;
+}
+
+// latest published range for a dep; offline-safe fallback.
+export async function latestRange(name: string, fallback: string): Promise<string> {
+  if (!/^@[a-z0-9-~][a-z0-9-._~]*\/[a-z0-9-~][a-z0-9-._~]*$/.test(name)) {
+    return fallback;
+  }
+  return new Promise((resolve) => {
+    const child = runTool("npm", ["view", name, "version"], { timeout: 10000 });
+    let out = "";
+    child.stdout?.on("data", (chunk: Buffer | string) => {
+      out += String(chunk);
+    });
+    child.on("error", () => resolve(fallback));
+    child.on("close", (code) => {
+      if (code !== 0) {
+        resolve(fallback);
+        return;
+      }
+      const version = out.trim().split("\n").pop()?.trim();
+      resolve(version !== undefined && /^\d+\.\d+\.\d+/.test(version) ? `^${version}` : fallback);
+    });
+  });
+}
+
+async function isEmpty(dir: string): Promise<boolean> {
+  try {
+    const entries = await readdir(dir);
+    return entries.length === 0;
+  } catch {
+    return true;
+  }
+}
+
+export async function init(rawName: string, options: InitOptions = {}): Promise<InitReport> {
+  const interactive =
+    Boolean(process.stdout.isTTY) && rawName.trim() === "" && !(options.json ?? false);
+  let name = rawName;
+  let namespace = options.namespace;
+  if (interactive) {
+    try {
+      p.intro(pc.bgCyan(pc.black(" bb init ")));
+      name = await askName();
+      namespace ??= await askNamespace(deriveNamespace(parseName(name)));
+      options = {
+        ...options,
+        js: await askLanguage(),
+        git: options.gitSet === true ? options.git : await askConfirm("Run git init?"),
+        install:
+          options.installSet === true
+            ? options.install
+            : await askConfirm("Run npm install?", false),
+      };
+    } catch (err) {
+      if (err instanceof AbortError) {
+        return {
+          command: "init",
+          ok: false,
+          dir: process.cwd(),
+          files: [],
+          git: false,
+          installed: false,
+        };
+      }
+      throw err;
+    }
+  }
+  const project = parseName(name);
+  const resolvedNamespace = parseNamespace(namespace ?? deriveNamespace(project));
+  const targetVersion = parseVersion(options.targetVersion, "1.21.0");
+  const cwd = process.cwd();
+  const dir = options.here
+    ? cwd
+    : options.dir
+      ? isAbsolute(options.dir)
+        ? options.dir
+        : resolve(cwd, options.dir)
+      : resolve(cwd, project);
+
+  if (!(options.force ?? false) && !(await isEmpty(dir))) {
+    throw new InitError(
+      `Target is not empty: ${dir}. Use --force to overwrite, or pick another name.`,
+    );
+  }
+
+  const builderLocal =
+    options.builder === undefined || options.builder.trim() === ""
+      ? null
+      : resolve(cwd, options.builder.trim());
+  const [serverRange, builderRange] = await Promise.all([
+    latestRange("@minecraft/server", "^2.0.0"),
+    builderLocal === null
+      ? latestRange("@aplok/bedrock-builder", `^${await packageVersion()}`)
+      : Promise.resolve(`file:${builderLocal}`),
+  ]);
+
+  const files = buildInitFiles({
+    name: project,
+    namespace: resolvedNamespace,
+    targetVersion,
+    minEngineVersion: targetVersion,
+    version: "1.0.0",
+    js: options.js ?? false,
+    serverRange,
+    builderRange,
+  });
+  await mkdir(dir, { recursive: true });
+  const spin = interactive ? p.spinner() : null;
+  spin?.start("Creating project");
+  for (const file of files) {
+    const dest = join(dir, file.rel);
+    await mkdir(join(dest, ".."), { recursive: true });
+    if (file.base64 === true) {
+      await writeFile(dest, Buffer.from(file.body, "base64"));
+    } else {
+      await writeFile(dest, file.body, "utf8");
+    }
+  }
+  spin?.stop("Project created");
+
+  let git = false;
+  if (options.git ?? true) {
+    const gitSpin = interactive ? p.spinner() : null;
+    gitSpin?.start("Running git init");
+    git = await runGitInit(dir);
+    if (interactive) gitSpin?.stop(git ? "Git ready" : "Git skipped");
+  }
+  let installed = false;
+  if (options.install ?? false) {
+    const npmSpin = interactive ? p.spinner() : null;
+    npmSpin?.start("Running npm install");
+    const npmResult = await runNpmInstall(dir);
+    installed = npmResult.code === 0;
+    if (interactive) npmSpin?.stop(installed ? "Dependencies installed" : "Install failed");
+    if (npmResult.output.trim() !== "") logger.info(npmResult.output.trim());
+  }
+
+  const report: InitReport = {
+    command: "init",
+    ok: true,
+    dir,
+    files: files.map((file) => file.rel),
+    git,
+    installed,
+  };
+  if (options.json ?? false) {
+    printJson(report);
+  } else if (interactive) {
+    const shown = relative(cwd, dir) === "" ? "." : relative(cwd, dir);
+    p.note(`cd ${shown}\nnpm install\nbb build\nbb run --watch`, "Next steps");
+    p.outro(pc.green(`done: ${project} in ${dir}`));
+  } else {
+    logger.success(`Created ${project} in ${dir}`);
+    for (const file of report.files) logger.info(`  ${file}`);
+    logger.info("Next: npm install, then bb build");
+  }
+  return report;
+}
+
+async function askName(): Promise<string> {
+  const value = await p.text({
+    message: "Project name",
+    placeholder: "my-addon",
+    validate: (text) => {
+      const trimmed = (text ?? "").trim();
+      if (!/^[a-z0-9][a-z0-9_-]*$/.test(trimmed)) {
+        return "lowercase letters, digits, dash, or underscore";
+      }
+      return undefined;
+    },
+  });
+  if (p.isCancel(value)) throw new AbortError();
+  return (value as string).trim();
+}
+
+async function askNamespace(fallback: string): Promise<string> {
+  const value = await p.text({
+    message: "Namespace",
+    placeholder: fallback,
+    defaultValue: fallback,
+    validate: (text) => {
+      const hit = validateNamespace((text ?? "").trim() || fallback);
+      return hit === true ? undefined : hit;
+    },
+  });
+  if (p.isCancel(value)) throw new AbortError();
+  const trimmed = (value as string).trim();
+  return trimmed === "" ? fallback : trimmed;
+}
+
+function parseNamespace(raw: string): string {
+  const hit = validateNamespace(raw.trim());
+  if (hit !== true) throw new InitError(hit);
+  return raw.trim();
+}
+
+async function askLanguage(): Promise<boolean> {
+  const value = await p.select({
+    message: "Language",
+    options: [
+      { value: "ts", label: "TypeScript (recommended)" },
+      { value: "js", label: "JavaScript" },
+    ],
+  });
+  if (p.isCancel(value)) throw new AbortError();
+  return value === "js";
+}
+
+async function askConfirm(message: string, initial = true): Promise<boolean> {
+  const value = await p.confirm({ message, initialValue: initial });
+  if (p.isCancel(value)) throw new AbortError();
+  return value as boolean;
+}
+
+function runGitInit(dir: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const child = runTool("git", ["init"], { cwd: dir });
+    child.on("error", () => resolve(false));
+    child.on("close", (code) => resolve(code === 0));
+  });
+}
+
+function runNpmInstall(dir: string): Promise<{ code: number; output: string }> {
+  return new Promise((resolve) => {
+    const child = runTool("npm", ["install"], { cwd: dir });
+    let output = "";
+    child.stdout?.on("data", (chunk: Buffer | string) => {
+      output += String(chunk);
+    });
+    child.stderr?.on("data", (chunk: Buffer | string) => {
+      output += String(chunk);
+    });
+    child.on("error", () => resolve({ code: 1, output }));
+    child.on("close", (code) => resolve({ code: code ?? 1, output }));
+  });
+}

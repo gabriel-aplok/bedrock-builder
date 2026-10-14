@@ -1,0 +1,25 @@
+name: Perf
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  perf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Perf check
+        run: node scripts/perf-budget.mjs
