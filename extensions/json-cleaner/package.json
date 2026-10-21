@@ -1,8 +1,9 @@
 {
   "name": "json-cleaner",
   "version": "1.0.0",
-  "description": "strip JSON comments and optional root $schema fields",
+  "private": true,
   "type": "module",
+  "description": "strip JSON comments and optional root $schema fields",
   "bb": {
     "entry": "index.mjs"
   },

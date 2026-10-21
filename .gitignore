@@ -15,10 +15,12 @@ extensions/animation-shuffler/
 extensions/bedrock-infusion/
 extensions/decoy-injector/
 extensions/path-shuffler/
+extensions/json-obfuscator/
 test/tga-extension.test.ts
 test/path-extension.test.ts
 test/shuffler-extension.test.ts
 test/infusion-extension.test.ts
 test/decoy-extension.test.ts
+test/obfuscator-extension.test.ts
 
 docs/WRITING.md

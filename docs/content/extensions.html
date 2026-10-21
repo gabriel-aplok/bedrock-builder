@@ -94,10 +94,6 @@
     or minify files.
   </li>
   <li>
-    <code>json-obfuscator</code> escapes JSON strings as unicode so packs read harder. Parsed values
-    stay identical, manifests are never touched.
-  </li>
-  <li>
     <code>spawn-egg-generator</code> emits minimal RP client entities with spawn egg colors for BP
     entities that have none. Sources are never changed, stale eggs prune on rebuild.
   </li>
@@ -137,28 +133,6 @@
 <p>
   Both settings default to false. The extension runs on every JSON file and leaves unchanged files
   alone.
-</p>
-<h2>Json obfuscator settings</h2>
-<pre><code>{
-  "bb": {
-    "extensions": [
-      {
-        "name": "json-obfuscator",
-        "settings": {
-          "minify": true,
-          "protectedKeys": ["format_version"],
-          "include": ["packs/**/*.json"],
-          "exclude": ["**/texts/**"]
-        }
-      }
-    ]
-  }
-}</code></pre>
-<p>
-  Every string becomes <code>\uXXXX</code> escapes, including keys. Parsing gives back the same
-  values, so the game reads the pack the same way. <code>manifest.json</code> files are always
-  skipped, and protected keys stay literal with their values. <code>include</code> defaults to all
-  JSON files, <code>exclude</code> defaults to none. <code>minify</code> defaults to false.
 </p>
 <h2>Spawn egg generator settings</h2>
 <pre><code>{
