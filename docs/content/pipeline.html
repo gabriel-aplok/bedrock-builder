@@ -1,0 +1,47 @@
+<h1>Build Pipeline</h1>
+<p>
+  <code>bb build</code> turns <code>src/</code> plus <code>packs/</code> into
+  <code>dist/packs/BP/</code> and <code>dist/packs/RP/</code>. The pipeline is incremental:
+  unchanged files copy once and skip on the next run.
+</p>
+<h2>Stages</h2>
+<ul>
+  <li>
+    Bundle: esbuild compiles the entry file to <code>BP/scripts/main.js</code>. Dev mode keeps
+    sourcemaps and skips minify. Release mode minifies and drops sourcemaps.
+  </li>
+  <li>Scan: the pipeline lists every file under both pack folders.</li>
+  <li>
+    Classify: each file matches a processor by extension and path. JSON validates, PNG decodes,
+    audio normalizes, text copies.
+  </li>
+  <li>
+    Cache: each file hashes with sha256. Unchanged hash plus mode plus existing output means skip.
+  </li>
+  <li>
+    Prune: outputs with no matching source are removed, so deleted files never linger in
+    <code>dist/</code>.
+  </li>
+</ul>
+<h2>Dev versus release</h2>
+<pre><code>bb build
+bb build --release</code></pre>
+<p>
+  Dev is the default: fast, sourcemaps inline, no minify. Release minifies the bundle and runs the
+  full pipeline with release mode.
+  <code>bb ship</code> always builds release first.
+</p>
+<h2>Extensions</h2>
+<p>
+  The pipeline loads user extensions from the <code>extensions</code> array in the config. Missing
+  or broken extensions warn and skip, never fail the build. Core texture and audio helpers stay
+  exported for extension authors. List resolved extensions with <code>bb ext</code>.
+</p>
+<h2>Typecheck</h2>
+<pre><code>bb build --typecheck
+bb run --watch</code></pre>
+<p>
+  Typecheck is opt-in on <code>build</code> and <code>ship</code> through <code>tsc --noEmit</code>.
+  The bundler never typechecks. <code>bb run --watch</code> runs a parallel
+  <code>tsc --watch</code> that prints errors on save without blocking the rebuild.
+</p>

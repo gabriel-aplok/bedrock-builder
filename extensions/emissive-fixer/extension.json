@@ -1,0 +1,6 @@
+{
+  "name": "emissive-fixer",
+  "version": "1.0.0",
+  "description": "zero rgb on fully transparent png pixels, fixes emissive bleed",
+  "entry": "index.mjs"
+}

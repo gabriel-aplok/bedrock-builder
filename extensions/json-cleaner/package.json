@@ -1,0 +1,13 @@
+{
+  "name": "json-cleaner",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "strip JSON comments and optional root $schema fields",
+  "bb": {
+    "entry": "index.mjs"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.3.1"
+  }
+}

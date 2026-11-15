@@ -1,0 +1,150 @@
+<h1>VS Code Extension</h1>
+<p>
+  The Bedrock Builder extension runs bb commands from the command palette, wires Mojang schemas into
+  json files through user settings (no project files), and adds go to definition for identifiers,
+  geometry, and file refs. Script hover and go to come from the TypeScript server once the project
+  resolves.
+</p>
+<h2>Install</h2>
+<pre><code>cd bedrock-vscode
+npm install
+npm run build
+npm run vsix</code></pre>
+<p>
+  Install the vsix with <code>Extensions: Install from VSIX</code>, or run with F5 from
+  <code>bedrock-vscode/</code>.
+</p>
+<h2>Commands</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Bedrock: Build</code></td>
+      <td>Bundle scripts and copy packs to <code>dist/</code>.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Run in game</code></td>
+      <td>Deploy, using the <code>bedrock.run.world</code> target when set.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Select run world</code></td>
+      <td>Pick the deploy world from installed worlds, or clear back to dev packs.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Ship .mcaddon</code></td>
+      <td>Release build plus <code>.mcaddon</code> zip.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Compile brarchive pack</code></td>
+      <td>Server-optimized pack via the dedicated server.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Select server folder</code></td>
+      <td>Pick the folder holding <code>bedrock_server.exe</code>.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Check project</code></td>
+      <td>Run <code>bb check</code>, findings land in the Bedrock channel.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Check scripts</code></td>
+      <td>Runtime imports, BP manifest dependency, and installed server major.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Test content links</code></td>
+      <td>Run the harness, findings land in the Bedrock channel.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Pack report</code></td>
+      <td>Read-only pack health: counts, duplicates, big files.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: New feature</code></td>
+      <td>Type pick, name input, and sidecar kind picks.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Show changed files</code></td>
+      <td>List changed files since the last build in the Bedrock channel.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Rewrite manifests</code></td>
+      <td>Sync pack manifests, with an optional version for both packs.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Bump version</code></td>
+      <td>Set the project version in config plus both manifests.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Publish release</code></td>
+      <td>Ship, harness check, and optional version bump, tag, and push.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Import pack folder</code></td>
+      <td>Adopt the open folder with generated config and package files.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: New project</code></td>
+      <td>Scaffold a project into a picked parent folder, then offer to open it.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Update dependencies</code></td>
+      <td>Refresh <code>@minecraft/server</code> and the builder.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Start watch deploy</code></td>
+      <td>Deploy watch with stop control, backed by <code>startDeployWatch</code>.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Refresh completions</code></td>
+      <td>Rebuild the project value index for json completion.</td>
+    </tr>
+    <tr>
+      <td><code>Bedrock: Select schema version</code></td>
+      <td>Pick the Mojang schema version from <code>latest</code>, <code>beta</code>, or exact.</td>
+    </tr>
+  </tbody>
+</table>
+<h2>Settings</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Setting</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>bedrock.configPath</code></td>
+      <td>Config path relative to the workspace folder. Empty means auto detect.</td>
+    </tr>
+    <tr>
+      <td><code>bedrock.run.world</code></td>
+      <td>Deploy into a named world folder. Empty means the dev packs.</td>
+    </tr>
+    <tr>
+      <td><code>bedrock.brarchive.serverDir</code></td>
+      <td>Folder with <code>bedrock_server.exe</code>. Empty means config, env, then local.</td>
+    </tr>
+    <tr>
+      <td><code>bedrock.harness.strict</code></td>
+      <td>Strict harness: unused lang keys and missing icons fail.</td>
+    </tr>
+    <tr>
+      <td><code>bedrock.schema.version</code></td>
+      <td>Mojang schema version: <code>latest</code>, <code>beta</code>, or exact.</td>
+    </tr>
+    <tr>
+      <td><code>bedrock.schema.auto</code></td>
+      <td>Download schemas and wire json validation on startup.</td>
+    </tr>
+    <tr>
+      <td><code>bedrock.script.check</code></td>
+      <td>Check script setup on startup.</td>
+    </tr>
+  </tbody>
+</table>

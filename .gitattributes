@@ -1,0 +1,5 @@
+# force lf everywhere so prettier --check passes on windows too.
+* text=auto eol=lf
+*.png binary
+*.vsix binary
+*.mcaddon binary

@@ -1,0 +1,6 @@
+dist/
+node_modules/
+docs/docs/
+docs/assets/
+*.tgz
+coverage/

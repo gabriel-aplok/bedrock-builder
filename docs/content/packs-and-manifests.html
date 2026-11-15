@@ -1,0 +1,46 @@
+<h1>Packs and Manifests</h1>
+<p>
+  Every add-on is two packs. The behavior pack (BP) holds logic and data. The resource pack (RP)
+  holds visuals and audio. Each pack has a
+  <code>manifest.json</code> that names it and links it.
+</p>
+<h2>What the manifests hold</h2>
+<ul>
+  <li>
+    <code>header.uuid</code> uniquely identifies the pack. The game uses it to tell packs apart.
+  </li>
+  <li><code>header.version</code> and module versions track the pack version.</li>
+  <li><code>min_engine_version</code> sets the lowest game version that loads the pack.</li>
+  <li>
+    BP declares a <code>data</code> module and a <code>script</code> module with the bundle entry
+    <code>scripts/main.js</code>.
+  </li>
+  <li>
+    RP declares a <code>resources</code> module and a dependency on the BP uuid, so the two packs
+    load as one add-on.
+  </li>
+  <li>BP depends on <code>@minecraft/server</code> for the script API.</li>
+</ul>
+<h2>Fresh UUIDs per project</h2>
+<p><code>bb init</code> generates fresh UUIDs for every create. Cloned projects never collide.</p>
+<h2>Rewrite with bb manifest</h2>
+<pre><code>bb manifest --dry-run
+bb manifest --name my-addon --pack-version 1.1.0</code></pre>
+<p>
+  <code>bb manifest</code> detects the layout, rewrites both manifests, and cross-links the RP
+  dependency to the BP uuid. <code>--dry-run</code> prints the plan and writes nothing.
+</p>
+<h2>Bump with bb version</h2>
+<pre><code>bb version 1.1.0</code></pre>
+<p>
+  <code>bb version</code> writes one version to the config plus both manifests, so the three never
+  drift apart.
+</p>
+<h2>Validate with bb check</h2>
+<pre><code>bb check
+bb check --fix</code></pre>
+<p>
+  <code>bb check</code> verifies the config, both manifests, the entry file, and the deploy target.
+  <code>--fix</code> creates what is missing. <code>bb ship</code> validates the manifests again
+  before zipping.
+</p>

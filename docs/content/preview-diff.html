@@ -1,0 +1,19 @@
+<h1>Preview changes with bb diff</h1>
+<p>
+  <code>bb diff</code> shows what changed since the last build. It reads the existing cache,
+  compares hashes, and lists added, modified, and deleted files. It never builds and never writes.
+</p>
+<pre><code>bb diff
+bb diff --json</code></pre>
+<h2>What each status means</h2>
+<ul>
+  <li>Added: source exists with no cache entry. It ships on the next build.</li>
+  <li>Modified: hash differs from the last build, or the output is missing.</li>
+  <li>Deleted: cache entry exists but the source is gone. The next build prunes the output.</li>
+</ul>
+<h2>When the cache is empty</h2>
+<p>
+  With no cache file every source lists as added. Run <code>bb build</code> once, then
+  <code>bb diff</code> reports only real changes. <code>bb clean</code> wipes the cache, so diff
+  after clean lists everything as added.
+</p>

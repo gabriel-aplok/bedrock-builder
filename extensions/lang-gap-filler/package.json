@@ -1,0 +1,7 @@
+{
+  "name": "lang-gap-filler",
+  "version": "1.0.0",
+  "description": "report missing lang keys and optionally emit completed language files",
+  "type": "module",
+  "main": "index.mjs"
+}

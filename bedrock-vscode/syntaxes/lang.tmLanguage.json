@@ -1,0 +1,19 @@
+{
+  "scopeName": "source.bedrock-lang",
+  "name": "Bedrock Lang",
+  "patterns": [{ "include": "#comment" }, { "include": "#entry" }],
+  "repository": {
+    "comment": {
+      "name": "comment.line.bedrock-lang",
+      "match": "^\\s*##.*$"
+    },
+    "entry": {
+      "name": "meta.entry.bedrock-lang",
+      "match": "^\\s*([^=\\s][^=]*?)\\s*(=)",
+      "captures": {
+        "1": { "name": "variable.other.bedrock-lang" },
+        "2": { "name": "punctuation.separator.bedrock-lang" }
+      }
+    }
+  }
+}
